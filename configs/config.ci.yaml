@@ -1,0 +1,61 @@
+---
+logging:
+  level: info   # The normal level in production
+  # level: trace  # Will display the sql statements, usefult for development
+  # level: debug
+  # Set to false to get a json output for the log
+  console: true
+
+web:
+  port: 8000
+
+database:
+  host: localhost
+  port: 5432
+  user: postgres
+  password: postgres
+  name: postgres
+
+kafka:
+  auto:
+    offset:
+      reset: latest
+    commit:
+      interval:
+        ms: 5000
+  bootstrap:
+    servers: localhost:9092
+  group:
+    id: todos
+  message:
+    send:
+      max:
+        retries: 15
+  request:
+    timeout:
+      ms: 30000
+    required:
+      acks: -1
+  retry:
+    backoff:
+      ms: 100
+  timeout: 10000
+  topics:
+    - platform.todo.todo-created
+  # sasl:
+  #   username: someusername
+  #   passowrd: somepassword
+  #   mechanism: somemechanism
+  #   protocol: someprotocol
+
+metrics:
+  path: "/metrics"
+  port: 9000
+
+clients:
+  service-1:
+    base_url: http://localhost:8010/api/service-1/v1
+
+app:
+  # TODO Update the path prefix for your API
+  url_path_prefix: "/api/todo"
