@@ -170,9 +170,6 @@ func Load(cfg *Config) *viper.Viper {
 	v.AutomaticEnv()
 
 	setDefaults(v)
-	// if clowder.IsClowderEnabled() {
-	// 	setClowderConfiguration(v, clowder.LoadedConfig)
-	// }
 
 	if err = v.ReadInConfig(); err != nil {
 		slog.Warn("Not using config.yaml", slog.Any("error", err))

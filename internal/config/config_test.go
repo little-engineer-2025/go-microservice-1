@@ -4,8 +4,6 @@ import (
 	"testing"
 
 	validator "github.com/go-playground/validator/v10"
-	"github.com/openlyinc/pointy"
-	clowder "github.com/redhatinsights/app-common-go/pkg/api/v1"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
@@ -26,39 +24,6 @@ func TestSetDefaults(t *testing.T) {
 	assert.Equal(t, DefaultTokenExpirationTimeSeconds, v.Get("app.token_expiration_seconds"))
 	assert.Equal(t, PaginationDefaultLimit, v.Get("app.pagination_default_limit"))
 	assert.Equal(t, PaginationMaxLimit, v.Get("app.pagination_max_limit"))
-}
-
-func TestHasKafkaBrokerConfig(t *testing.T) {
-	assert.False(t, hasKafkaBrokerConfig(nil))
-	cfg := clowder.AppConfig{}
-	assert.False(t, hasKafkaBrokerConfig(&cfg))
-	cfg.Kafka = &clowder.KafkaConfig{}
-	assert.False(t, hasKafkaBrokerConfig(&cfg))
-	cfg.Kafka.Brokers = []clowder.BrokerConfig{}
-	assert.False(t, hasKafkaBrokerConfig(&cfg))
-	cfg.Kafka.Brokers = append(cfg.Kafka.Brokers, clowder.BrokerConfig{})
-	assert.False(t, hasKafkaBrokerConfig(&cfg))
-	cfg.Kafka.Brokers[0].Hostname = "test.kafka.svc.localdomain"
-	assert.False(t, hasKafkaBrokerConfig(&cfg))
-	cfg.Kafka.Brokers[0].Port = pointy.Int(3000)
-	assert.True(t, hasKafkaBrokerConfig(&cfg))
-}
-
-func TestAddEventConfigDefaults(t *testing.T) {
-	assert.PanicsWithValue(t, "'options' is nil", func() {
-		addEventConfigDefaults(nil)
-	})
-
-	v := viper.New()
-	addEventConfigDefaults(v)
-	assert.Equal(t, 10000, v.Get("kafka.timeout"))
-	assert.Equal(t, DefaultAppName, v.Get("kafka.group.id"))
-	assert.Equal(t, "latest", v.Get("kafka.auto.offset.reset"))
-	assert.Equal(t, 5000, v.Get("kafka.auto.commit.interval.ms"))
-	assert.Equal(t, -1, v.Get("kafka.request.required.acks"))
-	assert.Equal(t, 15, v.Get("kafka.message.send.max.retries"))
-	assert.Equal(t, 100, v.Get("kafka.retry.backoff.ms"))
-
 }
 
 func TestLoad(t *testing.T) {
