@@ -13,7 +13,6 @@ import (
 	"strings"
 
 	validator "github.com/go-playground/validator/v10"
-	clowder "github.com/redhatinsights/app-common-go/pkg/api/v1"
 	"github.com/spf13/viper"
 	"golang.org/x/exp/slog"
 	"k8s.io/utils/env"
@@ -48,7 +47,6 @@ type Config struct {
 	Web         Web
 	Database    Database
 	Logging     Logging
-	Kafka       Kafka
 	Cloudwatch  Cloudwatch
 	Metrics     Metrics
 	Clients     Clients
@@ -82,54 +80,6 @@ type Cloudwatch struct {
 	Session string
 	Group   string
 	Stream  string
-}
-
-type Kafka struct {
-	Timeout int
-	Group   struct {
-		Id string
-	}
-	Auto struct {
-		Offset struct {
-			Reset string
-		}
-		Commit struct {
-			Interval struct {
-				Ms int
-			}
-		}
-	}
-	Bootstrap struct {
-		Servers string
-	}
-	Topics []string
-	Sasl   struct {
-		Username  string
-		Password  string
-		Mechanism string
-		Protocol  string
-	}
-	Request struct {
-		Timeout struct {
-			Ms int
-		}
-		Required struct {
-			Acks int
-		}
-	}
-	Capath  string
-	Message struct {
-		Send struct {
-			Max struct {
-				Retries int
-			}
-		}
-	}
-	Retry struct {
-		Backoff struct {
-			Ms int
-		}
-	}
 }
 
 type Metrics struct {
@@ -180,9 +130,6 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("database.password", "")
 	v.SetDefault("database.name", "")
 	v.SetDefault("database.ca_cert_path", "")
-
-	// Kafka
-	addEventConfigDefaults(v)
 
 	// Cloudwatch
 
@@ -280,73 +227,6 @@ func Get() *Config {
 		panic("Invalid configuration")
 	}
 	return config
-}
-
-func hasKafkaBrokerConfig(cfg *clowder.AppConfig) bool {
-	if cfg == nil || cfg.Kafka == nil || cfg.Kafka.Brokers == nil || len(cfg.Kafka.Brokers) <= 0 {
-		return false
-	}
-	broker := cfg.Kafka.Brokers[0]
-	if broker.Hostname == "" || broker.Port == nil {
-		return false
-	}
-	return true
-}
-
-func addEventConfigDefaults(options *viper.Viper) {
-	if options == nil {
-		panic("'options' is nil")
-	}
-	options.SetDefault("kafka.timeout", 10000)
-	options.SetDefault("kafka.group.id", DefaultAppName)
-	options.SetDefault("kafka.auto.offset.reset", "latest")
-	options.SetDefault("kafka.auto.commit.interval.ms", 5000)
-	options.SetDefault("kafka.request.required.acks", -1) // -1 == "all"
-	options.SetDefault("kafka.message.send.max.retries", 15)
-	options.SetDefault("kafka.retry.backoff.ms", 100)
-
-	if !clowder.IsClowderEnabled() {
-		// If clowder is not present, set defaults to local configuration
-		TopicTranslationConfig = NewTopicTranslationWithDefaults()
-		options.SetDefault("kafka.bootstrap.servers", readEnv("KAFKA_BOOTSTRAP_SERVERS", ""))
-		options.SetDefault("kafka.topics", "platform."+DefaultAppName+".domain-created")
-		return
-	}
-
-	// Settings for clowder
-	cfg := clowder.LoadedConfig
-	TopicTranslationConfig = NewTopicTranslationWithClowder(cfg)
-	options.SetDefault("kafka.bootstrap.servers", strings.Join(clowder.KafkaServers, ","))
-
-	// Prepare topics
-	topics := []string{}
-	for _, value := range clowder.KafkaTopics {
-		topics = append(topics, value.Name)
-	}
-	options.SetDefault("kafka.topics", strings.Join(topics, ","))
-
-	if !hasKafkaBrokerConfig(cfg) {
-		return
-	}
-
-	if cfg.Kafka.Brokers[0].Cacert != nil {
-		// This method is writing only the first CA but if
-		// that behavior changes in the future, nothing will
-		// be changed here
-		caPath, err := cfg.KafkaCa(cfg.Kafka.Brokers...)
-		if err != nil {
-			panic("Kafka CA failed to write")
-		}
-		options.Set("kafka.capath", caPath)
-	}
-
-	broker := cfg.Kafka.Brokers[0]
-	if broker.Authtype != nil {
-		options.Set("kafka.sasl.username", *broker.Sasl.Username)
-		options.Set("kafka.sasl.password", *broker.Sasl.Password)
-		options.Set("kafka.sasl.mechanism", *broker.Sasl.SaslMechanism)
-		options.Set("kafka.sasl.protocol", *broker.Sasl.SecurityProtocol)
-	}
 }
 
 func readEnv(key string, def string) string {
