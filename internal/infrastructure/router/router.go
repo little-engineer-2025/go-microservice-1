@@ -6,6 +6,7 @@ import (
 
 	"golang.org/x/exp/slog"
 
+	"github.com/avisiedo/go-microservice-1/internal/api/http/healthcheck"
 	metrics_handler "github.com/avisiedo/go-microservice-1/internal/api/http/metrics"
 	"github.com/avisiedo/go-microservice-1/internal/config"
 	handler "github.com/avisiedo/go-microservice-1/internal/handler/http"
@@ -60,12 +61,6 @@ func configCommonMiddlewares(e *echo.Echo, cfg *config.Config) {
 	}
 
 	middlewares := []echo.MiddlewareFunc{}
-	middlewares = append(middlewares,
-		app_middleware.SLogMiddlewareWithConfig(&app_middleware.SLogMiddlewareConfig{
-			Skipper: loggerSkipperWithPaths(skipperPaths...),
-			Log:     slog.Default(),
-		}),
-	)
 	// middlewares = append(middlewares,
 	// 	middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 	// 		// Request logger values for middleware.RequestLoggerValues
@@ -83,6 +78,13 @@ func configCommonMiddlewares(e *echo.Echo, cfg *config.Config) {
 	// 		LogValuesFunc: logger.MiddlewareLogValues,
 	// 	}),
 	// )
+	middlewares = append(middlewares,
+		app_middleware.SLogMiddlewareWithConfig(&app_middleware.SLogMiddlewareConfig{
+			Skipper: loggerSkipperWithPaths(skipperPaths...),
+			Log:     slog.Default(),
+		}),
+	)
+
 	middlewares = append(middlewares, middleware.Recover())
 
 	e.Use(middlewares...)
@@ -116,19 +118,20 @@ func NewRouterWithConfig(e *echo.Echo, cfg *config.Config, public *openapi3.T, h
 	majorVersion := strings.Split(public.Info.Version, ".")[0]
 	majorMinorVersion := strings.Join([]string{majorVersion, strings.Split(public.Info.Version, ".")[1]}, ".")
 
-	newGroupPrivate(e.Group(privatePath), cfg)
-	newGroupPublic(e.Group(cfg.Application.PathPrefix+"/v"+majorVersion), cfg, h, h, m)
-	newGroupPublic(e.Group(cfg.Application.PathPrefix+"/v"+majorMinorVersion), cfg, h, h, m)
+	healthcheck.RegisterHandlers(e, h)
+	newPrivate(e.Group(privatePath), cfg, h)
+	newPublic(e.Group(cfg.Application.PathPrefix+"/v"+majorVersion), cfg, h, h, m)
+	newPublic(e.Group(cfg.Application.PathPrefix+"/v"+majorMinorVersion), cfg, h, h, m)
 	return e
 }
 
-// NewRouterForMetrics fill the routing information for /metrics endpoint.
+// NewMetricsRouter fill the routing information for /metrics endpoint.
 // e is the echo instance
 // cfg is the router configuration
 // h is the handler to retrieve the metrics.
 // Return the echo instance configured for the metrics for success execution,
 // else raise any panic.
-func NewRouterForMetrics(e *echo.Echo, cfg *config.Config, h metrics_handler.ServerInterface) *echo.Echo {
+func NewMetricsRouter(e *echo.Echo, cfg *config.Config, h metrics_handler.ServerInterface) *echo.Echo {
 	if e == nil {
 		panic("'e' is nil")
 	}

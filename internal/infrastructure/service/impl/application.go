@@ -49,7 +49,7 @@ func NewApplication(ctx context.Context, wg *sync.WaitGroup, cfg *config.Config,
 	handler := handler_impl.NewHandler(s.Config, db, metrics)
 
 	// Create Metrics service
-	s.Metrics = NewMetrics(s.Context, s.WaitGroup, s.Config, handler)
+	// s.Metrics = NewMetrics(s.Context, s.WaitGroup, s.Config, handler)
 
 	// Create Api service
 	s.Api = NewApi(s.Context, s.WaitGroup, s.Config, handler, metrics)

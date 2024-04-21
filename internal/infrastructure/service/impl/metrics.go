@@ -36,7 +36,7 @@ func NewMetrics(ctx context.Context, wg *sync.WaitGroup, cfg *config.Config, app
 	result.waitGroup = wg
 	result.config = cfg
 
-	result.echo = router.NewRouterForMetrics(
+	result.echo = router.NewMetricsRouter(
 		echo.New(),
 		cfg,
 		app,

@@ -19,7 +19,7 @@ const (
 	basePath = "/api/todo"
 )
 
-func newGroupPublic(e *echo.Group, cfg *config.Config, publicHandler public.ServerInterface, openapiHandler openapi.ServerInterface, metrics *metrics.Metrics) *echo.Group {
+func newPublic(e *echo.Group, cfg *config.Config, publicHandler public.ServerInterface, openapiHandler openapi.ServerInterface, metrics *metrics.Metrics) *echo.Group {
 	if e == nil {
 		panic("echo group is nil")
 	}
