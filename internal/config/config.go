@@ -36,8 +36,6 @@ const (
 	// PaginationMaxLimit is the default max limit for the pagination
 	PaginationMaxLimit = 1000
 
-	// DefaultAcceptXRHFakeIdentity is disabled
-	DefaultAcceptXRHFakeIdentity = false
 	// DefaultValidateAPI is true
 	DefaultValidateAPI = true
 )
@@ -60,8 +58,8 @@ type Web struct {
 type Database struct {
 	Host     string
 	Port     int
-	User     string
-	Password string
+	User     string `json:"-"`
+	Password string `json:"-"`
 	Name     string
 	// https://stackoverflow.com/questions/54844546/how-to-unmarshal-golang-viper-snake-case-values
 	CACertPath string `mapstructure:"ca_cert_path"`
@@ -75,8 +73,8 @@ type Logging struct {
 
 type Cloudwatch struct {
 	Region  string
-	Key     string
-	Secret  string
+	Key     string `json:"-"`
+	Secret  string `json:"-"`
 	Session string
 	Group   string
 	Stream  string
@@ -207,12 +205,11 @@ func Get() *Config {
 		return config
 	}
 	config = &Config{}
-	v := Load(config)
+	_ = Load(config)
 
 	// Dump configuration as JSON
 	if config.Logging.Level == "debug" {
-		c := v.AllSettings()
-		b, err := json.MarshalIndent(c, "", "  ")
+		b, err := json.MarshalIndent(config, "", "  ")
 		if err != nil {
 			panic(err)
 		}
