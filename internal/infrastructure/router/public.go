@@ -57,6 +57,18 @@ func newPublic(e *echo.Group, cfg *config.Config, publicHandler public.ServerInt
 	if e == nil {
 		panic("echo group is nil")
 	}
+	if cfg == nil {
+		panic("cfg is nil")
+	}
+	if publicHandler == nil {
+		panic("publicHandler is nil")
+	}
+	if openapiHandler == nil {
+		panic("openapiHandler is nil")
+	}
+	if metrics == nil {
+		panic("metrics is nil")
+	}
 
 	// Wire the middlewares
 	middlewares := createMiddlewares(cfg, metrics)
