@@ -62,4 +62,4 @@ clients:
 # TODO Add here the application configuration
 app:
   # TODO Update the path prefix for your API
-  url_path_prefix: "/api/todo"
+  url_path_prefix: "/api/todo/v1"
