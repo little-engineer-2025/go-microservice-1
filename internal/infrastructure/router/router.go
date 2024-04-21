@@ -115,13 +115,9 @@ func NewRouterWithConfig(e *echo.Echo, cfg *config.Config, public *openapi3.T, h
 	newRouterWithConfigGuards(e, cfg, public)
 	configCommonMiddlewares(e, cfg)
 
-	majorVersion := strings.Split(public.Info.Version, ".")[0]
-	majorMinorVersion := strings.Join([]string{majorVersion, strings.Split(public.Info.Version, ".")[1]}, ".")
-
 	healthcheck.RegisterHandlers(e, h)
 	newPrivate(e.Group(privatePath), cfg, h)
-	newPublic(e.Group(cfg.Application.PathPrefix+"/v"+majorVersion), cfg, h, h, m)
-	newPublic(e.Group(cfg.Application.PathPrefix+"/v"+majorMinorVersion), cfg, h, h, m)
+	newPublic(e.Group(cfg.Application.PathPrefix), cfg, h, h, m)
 	return e
 }
 
