@@ -255,7 +255,7 @@ func TestNewSkipperOpenapi(t *testing.T) {
 	skipper := newSkipperOpenapi(cfg)
 	assert.NotNil(t, skipper)
 
-	path := fmt.Sprintf("%s/openapi.json", cfg.Application.PathPrefix+"/v1")
+	path := fmt.Sprintf("%s/openapi.json", cfg.Application.PathPrefix)
 	ctx := helperNewContextForSkipper(path, echo.GET, path, map[string]string{})
 	assert.True(t, skipper(ctx))
 }
