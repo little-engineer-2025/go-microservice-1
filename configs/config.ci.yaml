@@ -1,10 +1,12 @@
 ---
 logging:
-  level: info   # The normal level in production
-  # level: trace  # Will display the sql statements, usefult for development
-  # level: debug
+  # level: warn should be the level in production
+  # level: trace - Will display the sql statements, usefult for development
+  level: warn
   # Set to false to get a json output for the log
   console: true
+  # Set to true to get source code locations printed
+  location: false
 
 web:
   port: 8000
@@ -12,9 +14,9 @@ web:
 database:
   host: localhost
   port: 5432
-  user: postgres
-  password: postgres
-  name: postgres
+  user: db-user
+  password: db-secret
+  name: db-name
 
 kafka:
   auto:
@@ -26,7 +28,7 @@ kafka:
   bootstrap:
     servers: localhost:9092
   group:
-    id: todos
+    id: todo
   message:
     send:
       max:
@@ -41,7 +43,7 @@ kafka:
       ms: 100
   timeout: 10000
   topics:
-    - platform.todo.todo-created
+    - platform.todo.create
   # sasl:
   #   username: someusername
   #   passowrd: somepassword
@@ -52,10 +54,12 @@ metrics:
   path: "/metrics"
   port: 9000
 
+# TODO Set up configuration with third parties
 clients:
   service-1:
     base_url: http://localhost:8010/api/service-1/v1
 
+# TODO Add here the application configuration
 app:
   # TODO Update the path prefix for your API
-  url_path_prefix: "/api/todo"
+  url_path_prefix: "/api/todo/v1"
