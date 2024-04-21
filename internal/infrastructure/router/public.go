@@ -75,8 +75,8 @@ func newPublic(e *echo.Group, cfg *config.Config, publicHandler public.ServerInt
 	e.Use(middlewares...)
 
 	// Setup routes
-	public.RegisterHandlersWithBaseURL(e, publicHandler, "")
-	openapi.RegisterHandlersWithBaseURL(e, openapiHandler, "")
+	public.RegisterHandlers(e, publicHandler)
+	openapi.RegisterHandlers(e, openapiHandler)
 	return e
 }
 
