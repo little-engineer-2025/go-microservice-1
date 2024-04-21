@@ -9,35 +9,11 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// Liveness kubernetes probe endpoint
-	// (GET /livez)
-	GetLivez(ctx echo.Context) error
-	// Readiness kubernetes probe endpoint
-	// (GET /readyz)
-	GetReadyz(ctx echo.Context) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler ServerInterface
-}
-
-// GetLivez converts echo context to params.
-func (w *ServerInterfaceWrapper) GetLivez(ctx echo.Context) error {
-	var err error
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetLivez(ctx)
-	return err
-}
-
-// GetReadyz converts echo context to params.
-func (w *ServerInterfaceWrapper) GetReadyz(ctx echo.Context) error {
-	var err error
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetReadyz(ctx)
-	return err
 }
 
 // This is a simple interface which specifies echo.Route addition functions which
@@ -63,12 +39,5 @@ func RegisterHandlers(router EchoRouter, si ServerInterface) {
 // Registers handlers, and prepends BaseURL to the paths, so that the paths
 // can be served under a prefix.
 func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL string) {
-
-	wrapper := ServerInterfaceWrapper{
-		Handler: si,
-	}
-
-	router.GET(baseURL+"/livez", wrapper.GetLivez)
-	router.GET(baseURL+"/readyz", wrapper.GetReadyz)
 
 }
