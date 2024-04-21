@@ -15,6 +15,7 @@ type application struct {
 	config  *config.Config
 	db      *gorm.DB
 	metrics *metrics.Metrics
+	presenter_interface.Private
 	presenter_interface.Todo
 	presenter_interface.OpenAPI
 	presenter_interface.Healthcheck
@@ -38,6 +39,7 @@ func newHandler(cfg *config.Config, db *gorm.DB, m *metrics.Metrics) *applicatio
 
 	// Initialize the presenters
 	todoPresenter := presenter.NewTodo(cfg, interactor.NewTodo(repository.NewTodo(cfg)), db)
+	privatePresenter := presenter.NewPrivate(interactor.NewPrivate())
 	openAPIPresenter := presenter.NewOpenAPI()
 	instrumentationPresenter := presenter.NewInstrumentation(m)
 	healthcheckPresenter := presenter.NewHealthcheck(interactor.NewHealthcheck(cfg))
@@ -47,6 +49,7 @@ func newHandler(cfg *config.Config, db *gorm.DB, m *metrics.Metrics) *applicatio
 		config:          cfg,
 		db:              db,
 		metrics:         m,
+		Private:         privatePresenter,
 		Todo:            todoPresenter,
 		OpenAPI:         openAPIPresenter,
 		Instrumentation: instrumentationPresenter,
