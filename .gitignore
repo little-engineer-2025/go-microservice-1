@@ -1,12 +1,8 @@
 .DS_Store
-.cicd_bootstrap.sh
 secrets
-/idm-ci-secrets
 .venv
-/bin
-/tools/bin
-tmp.*/**
-**/__debug_bin
+tools/bin
+bin
 
 /api/node_modules
 /node_modules
