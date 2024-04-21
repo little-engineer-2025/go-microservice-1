@@ -19,11 +19,7 @@ const (
 	basePath = "/api/todo"
 )
 
-func newPublic(e *echo.Group, cfg *config.Config, publicHandler public.ServerInterface, openapiHandler openapi.ServerInterface, metrics *metrics.Metrics) *echo.Group {
-	if e == nil {
-		panic("echo group is nil")
-	}
-
+func createMiddlewares(cfg *config.Config, metrics *metrics.Metrics) []echo.MiddlewareFunc {
 	middlewares := []echo.MiddlewareFunc{}
 
 	// Initialize middlewares
@@ -54,8 +50,16 @@ func newPublic(e *echo.Group, cfg *config.Config, publicHandler public.ServerInt
 			),
 		)
 	}
+	return middlewares
+}
+
+func newPublic(e *echo.Group, cfg *config.Config, publicHandler public.ServerInterface, openapiHandler openapi.ServerInterface, metrics *metrics.Metrics) *echo.Group {
+	if e == nil {
+		panic("echo group is nil")
+	}
 
 	// Wire the middlewares
+	middlewares := createMiddlewares(cfg, metrics)
 	e.Use(middlewares...)
 
 	// Setup routes
