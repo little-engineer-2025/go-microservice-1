@@ -102,7 +102,7 @@ func (s *Suite) WaitReady(cfg *config.Config) {
 		panic("cfg is nil")
 	}
 	header := http.Header{}
-	path := s.DefaultPrivateBaseURL() + "/readyz"
+	path := s.DefaultHealthcheckBaseURL() + "/readyz"
 	for i := 0; i < 10; i++ {
 		resp, err := s.DoRequest(
 			http.MethodGet,
@@ -205,21 +205,29 @@ func (s *Suite) RunTestCases(testCases []TestCase) {
 	}
 }
 
+func (s *Suite) DefaultHostAPI() string {
+	return "http://localhost"
+}
+
 // DefaultPublicBaseURL retrieve the public base endpoint URL.
 // Return for the URL for the current configuration.
 func (s *Suite) DefaultPublicBaseURL() string {
 	// TODO Update this base URL
-	return fmt.Sprintf("http://localhost:%d/api/todo/v1", s.cfg.Web.Port)
+	return fmt.Sprintf("%s:%d%s", s.DefaultHostAPI(), s.cfg.Web.Port, s.cfg.Application.PathPrefix)
 }
 
 // DefaultPrivateBaseURL retrieve the private base endpoint URL.
 // Return for the URL for the current configuration.
 func (s *Suite) DefaultPrivateBaseURL() string {
-	return fmt.Sprintf("http://localhost:%d/private", s.cfg.Web.Port)
+	return fmt.Sprintf("%s:%d%s", s.DefaultHostAPI(), s.cfg.Web.Port, "/internal")
 }
 
-func (s *Suite) DefaultHealthchecBaseURL() string {
-	return fmt.Sprintf("http://localhost:%d", s.cfg.Web.Port)
+func (s *Suite) DefaultHealthcheckBaseURL() string {
+	return fmt.Sprintf("%s:%d", s.DefaultHostAPI(), s.cfg.Web.Port)
+}
+
+func (s *Suite) DefaultMetricsURL() string {
+	return fmt.Sprintf("%s:%d%s", s.DefaultHostAPI(), s.cfg.Metrics.Port, s.cfg.Metrics.Path)
 }
 
 // DoRequest execute a http request against a url using headers and the body specified.
