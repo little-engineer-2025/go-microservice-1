@@ -1,19 +1,14 @@
 package integration
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"sync"
 
 	"github.com/avisiedo/go-microservice-1/internal/api/header"
 	"github.com/avisiedo/go-microservice-1/internal/api/http/public"
-	"github.com/avisiedo/go-microservice-1/internal/config"
-	"github.com/avisiedo/go-microservice-1/internal/infrastructure/service"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 // SuiteBaseTodos represents the base Suite to be used for smoke tests, this
@@ -24,13 +19,6 @@ import (
 // would provide data partition between the tests.
 type SuiteBaseTodos struct {
 	Suite
-
-	cancel context.CancelFunc
-	svc    service.ApplicationService
-	wg     *sync.WaitGroup
-	db     *gorm.DB
-
-	cfg *config.Config
 }
 
 // SetupTest start the services and await until they are ready
