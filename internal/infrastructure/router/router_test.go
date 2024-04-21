@@ -105,22 +105,22 @@ func TestNewRouterWithConfig(t *testing.T) {
 func TestNewRouterForMetrics(t *testing.T) {
 	presenterMetrics := presenter.NewServerInterface(t)
 	assert.Panics(t, func() {
-		NewRouterForMetrics(nil, nil, nil)
+		NewMetricsRouter(nil, nil, nil)
 	})
 
 	e := echo.New()
 	assert.Panics(t, func() {
-		NewRouterForMetrics(e, nil, nil)
+		NewMetricsRouter(e, nil, nil)
 	})
 
 	cfg := &config.Config{}
 	_ = config.Load(cfg)
 
 	assert.Panics(t, func() {
-		_ = NewRouterForMetrics(e, cfg, nil)
+		_ = NewMetricsRouter(e, cfg, nil)
 	}, "'e' is nil")
 
 	assert.NotPanics(t, func() {
-		e = NewRouterForMetrics(e, cfg, presenterMetrics)
+		e = NewMetricsRouter(e, cfg, presenterMetrics)
 	}, "MetricsPath cannot be an empty string")
 }

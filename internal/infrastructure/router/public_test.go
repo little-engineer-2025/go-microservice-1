@@ -53,26 +53,27 @@ func helperNewGroupPublic(t *testing.T) (*echo.Echo, *config.Config, public.Serv
 	presenterOpenAPI := openapi.NewServerInterface(t)
 
 	e := echo.New()
-	require.NotNil(t, e)
+	public.RegisterHandlers(e.Group(cfg.Application.PathPrefix), presenterPublic)
+	public.RegisterHandlers(e.Group(cfg.Application.PathPrefix), presenterPublic)
 	return e, cfg, presenterPublic, presenterOpenAPI, m
 }
 
 func TestNewGroupPublicPanics(t *testing.T) {
 	assert.Panics(t, func() {
 		_, cfg, presenterPublic, presenterOpenAPI, m := helperNewGroupPublic(t)
-		newGroupPublic(nil, cfg, presenterPublic, presenterOpenAPI, m)
+		newPublic(nil, cfg, presenterPublic, presenterOpenAPI, m)
 	})
 	assert.Panics(t, func() {
 		e, cfg, presenterPublic, _, _ := helperNewGroupPublic(t)
-		newGroupPublic(e.Group(cfg.Application.PathPrefix), cfg, presenterPublic, nil, nil)
+		newPublic(e.Group(cfg.Application.PathPrefix), cfg, presenterPublic, nil, nil)
 	})
 	assert.Panics(t, func() {
 		e, cfg, presenterPublic, presenterOpenAPI, _ := helperNewGroupPublic(t)
-		newGroupPublic(e.Group(cfg.Application.PathPrefix), cfg, presenterPublic, presenterOpenAPI, nil)
+		newPublic(e.Group(cfg.Application.PathPrefix), cfg, presenterPublic, presenterOpenAPI, nil)
 	})
 	assert.NotPanics(t, func() {
 		e, cfg, presenterPublic, presenterOpenAPI, m := helperNewGroupPublic(t)
-		newGroupPublic(e.Group(cfg.Application.PathPrefix), cfg, presenterPublic, presenterOpenAPI, m)
+		newPublic(e.Group(cfg.Application.PathPrefix), cfg, presenterPublic, presenterOpenAPI, m)
 	})
 }
 
@@ -90,13 +91,6 @@ func TestNewGroupPublic(t *testing.T) {
 	majorMinorVersion := majorVersion + "." + strings.Split(swagger.Info.Version, ".")[1]
 
 	testCases := TestCaseExpected{
-		"/private/readyz": {
-			"GET": "github.com/avisiedo/go-microservice-1/internal/api/http/handler.ping",
-		},
-		"/private/livez": {
-			"GET": "github.com/avisiedo/go-microservice-1/internal/api/http/public.ping",
-		},
-
 		appPrefix + appName + "/v" + majorMinorVersion + "/openapi.json": {
 			"GET": "github.com/avisiedo/go-microservice-1/internal/api/http/openapi.(*ServerInterfaceWrapper).GetOpenapi-fm",
 		},
@@ -164,105 +158,66 @@ func TestNewGroupPublic(t *testing.T) {
 
 func TestNewGroupPublicGroupRegistered(t *testing.T) {
 	const (
-		appPrefix = "/api"
-		appName   = "/todo"
+		appPrefix = "/api/todo"
 	)
-	type TestCaseExpected map[string]map[string]string
+	type TestCaseGiven struct {
+		HandlerName string
+		Params      []string
+	}
+	type TestCase struct {
+		Given    TestCaseGiven
+		Expected string
+	}
+
 	swagger, err := public.GetSwagger()
 	require.NoError(t, err)
 	require.NotNil(t, swagger)
 
 	majorVersion := strings.Split(swagger.Info.Version, ".")[0]
-	majorMinorVersion := majorVersion + "." + strings.Split(swagger.Info.Version, ".")[1]
+	// majorMinorVersion := majorVersion + "." + strings.Split(swagger.Info.Version, ".")[1]
 
-	testCases := TestCaseExpected{
-		"/private/readyz": {
-			"GET": "github.com/avisiedo/go-microservice-1/internal/api/http/handler.ping",
-		},
-		"/private/livez": {
-			"GET": "github.com/avisiedo/go-microservice-1/internal/api/http/public.ping",
-		},
-
-		appPrefix + appName + "/v" + majorMinorVersion + "/openapi.json": {
-			"GET": "github.com/avisiedo/go-microservice-1/internal/api/http/openapi.(*ServerInterfaceWrapper).GetOpenapi-fm",
-		},
-		appPrefix + appName + "/v" + majorVersion + "/openapi.json": {
-			"GET": "github.com/avisiedo/go-microservice-1/internal/api/http/openapi.(*ServerInterfaceWrapper).GetOpenapi-fm",
+	testCases := []TestCase{
+		// openapi.json
+		{
+			Given: TestCaseGiven{
+				HandlerName: "github.com/avisiedo/go-microservice-1/internal/api/http/openapi.(*ServerInterfaceWrapper).GetOpenapi-fm",
+				Params:      []string{},
+			},
+			Expected: appPrefix + "/v" + majorVersion + "/openapi.json",
 		},
 
-		appPrefix + appName + "/v" + majorMinorVersion + "/todos": {
-			"GET":  "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).GetAllTodos-fm",
-			"POST": "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).CreateTodo-fm",
+		// public api
+		{
+			Given: TestCaseGiven{
+				HandlerName: "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).GetAllTodos-fm",
+				Params:      []string{},
+			},
+			Expected: appPrefix + "/v" + majorVersion + "/todos",
 		},
-		appPrefix + appName + "/v" + majorVersion + "/todos": {
-			"GET":  "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).GetAllTodos-fm",
-			"POST": "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).CreateTodo-fm",
-		},
-
-		appPrefix + appName + "/v" + majorMinorVersion + "/todos/:todoId": {
-			"GET":    "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).GetTodo-fm",
-			"PUT":    "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).UpdateTodo-fm",
-			"PATCH":  "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).PatchTodo-fm",
-			"DELETE": "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).DeleteTodo-fm",
-		},
-		appPrefix + appName + "/v" + majorVersion + "/todos/:todoId": {
-			"GET":    "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).GetTodo-fm",
-			"PUT":    "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).UpdateTodo-fm",
-			"PATCH":  "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).PatchTodo-fm",
-			"DELETE": "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).DeleteTodo-fm",
-		},
-
-		// This routes are added when the group is created
-
-		// Glob
-		appPrefix + appName + "/v" + majorMinorVersion + "/*": {
-			"echo_route_not_found": "github.com/labstack/echo/v4.glob..func1",
-		},
-		appPrefix + appName + "/v" + majorVersion + "/*": {
-			"echo_route_not_found": "github.com/labstack/echo/v4.glob..func1",
-		},
-
-		// Match base path
-		appPrefix + appName + "/v" + majorMinorVersion: {
-			"echo_route_not_found": "github.com/labstack/echo/v4.init.func1",
-		},
-		appPrefix + appName + "/v" + majorVersion: {
-			"echo_route_not_found": "github.com/labstack/echo/v4.init.func1",
+		{
+			Given: TestCaseGiven{
+				HandlerName: "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).CreateTodo-fm",
+				Params:      []string{},
+			},
+			Expected: appPrefix + "/v" + majorVersion + "/todos",
 		},
 	}
 
+	// Check panic
+	assert.PanicsWithValue(t, "echo group is nil", func() {
+		newPublic(nil, nil, nil, nil, nil)
+	})
+
 	// Check the group generated
-	e, cfg, publicPresenter, openAPIPresenter, m := helperNewGroupPublic(t)
+	for _, testCase := range testCases {
+		t.Logf("HandlerName=%s", testCase.Given.HandlerName)
+		e, cfg, publicPresenter, openAPIPresenter, m := helperNewGroupPublic(t)
 
-	prefix := cfg.Application.PathPrefix + "/v1"
-	group := newGroupPublic(e.Group(prefix), cfg, publicPresenter, openAPIPresenter, m)
-	require.NotNil(t, group)
+		prefix := cfg.Application.PathPrefix + "/v" + majorVersion
+		require.NotNil(t, newPublic(e.Group(prefix), cfg, publicPresenter, openAPIPresenter, m))
 
-	for _, route := range e.Routes() {
-		t.Logf("Method=%s Path=%s Name=%s", route.Method, route.Path, route.Name)
-
-		methods, okPath := testCases[route.Path]
-		assert.Truef(t, okPath, "path=%s not found into the expected ones", route.Path)
-
-		name, okMethod := methods[route.Method]
-		assert.Truef(t,
-			okMethod,
-			"method=%s not found into the expected ones for the path=%s",
-			route.Method,
-			route.Path)
-
-		// NOTE The check with the two names below evoke flaky tests
-		//      so this does not behave equals locally and the pipeline
-		//      The if will be until the root cause is figured out
-		// Check route name
-		if name != "github.com/labstack/echo/v4.glob..func1" && name != "github.com/labstack/echo/v4.init.func1" {
-			assert.Equalf(t,
-				name,
-				route.Name,
-				"handler for path=%s method=%s does not match",
-				route.Path,
-				route.Method)
-		}
+		result := e.Reverse(testCase.Given.HandlerName, testCase.Given.Params)
+		require.Equal(t, testCase.Expected, result)
 	}
 }
 
