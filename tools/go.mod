@@ -7,8 +7,6 @@ module github.com/avisiedo/go-microservice-1/tools
 //   build/package/Dockerfile
 go 1.20
 
-toolchain go1.22.0
-
 require (
 	github.com/achiku/planter v0.0.0-20230118102009-4847a8211e35
 	github.com/atombender/go-jsonschema v0.12.1
