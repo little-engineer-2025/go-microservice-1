@@ -146,7 +146,6 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("app.token_expiration_seconds", DefaultTokenExpirationTimeSeconds)
 	v.SetDefault("app.pagination_default_limit", PaginationDefaultLimit)
 	v.SetDefault("app.pagination_max_limit", PaginationMaxLimit)
-	v.SetDefault("app.accept_x_rh_fake_identity", DefaultAcceptXRHFakeIdentity)
 	v.SetDefault("app.validate_api", DefaultValidateAPI)
 	v.SetDefault("app.url_path_prefix", DefaultPathPrefix)
 	v.SetDefault("app.secret", "")
