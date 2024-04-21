@@ -92,7 +92,6 @@ TEST_GREP_FILTER := -v \
   -e /vendor/ \
   -e /internal/test \
   -e /internal/interface/ \
-  -e /internal/api/metrics \
   -e /internal/api/private \
   -e /internal/api/public
 
@@ -198,4 +197,5 @@ generate-deps: $(GODA)
 
 .PHONY: coverage
 coverage:  ## Printout coverage
-	go tool cover -func ./coverage.out
+	grep -v '.*\.gen\.go:' coverage.out > "$(PROJECT_DIR)/filtered_coverage.out"
+	go tool cover -func "$(PROJECT_DIR)/filtered_coverage.out"
