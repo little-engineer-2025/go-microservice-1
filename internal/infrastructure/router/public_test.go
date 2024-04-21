@@ -6,11 +6,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/avisiedo/go-microservice-1/internal/api/http/openapi"
 	"github.com/avisiedo/go-microservice-1/internal/api/http/public"
 	"github.com/avisiedo/go-microservice-1/internal/config"
 	"github.com/avisiedo/go-microservice-1/internal/infrastructure/metrics"
 	"github.com/avisiedo/go-microservice-1/internal/test"
-	openapi "github.com/avisiedo/go-microservice-1/internal/test/mock/api/http/openapi"
+	mock_openapi "github.com/avisiedo/go-microservice-1/internal/test/mock/api/http/openapi"
 	presenter "github.com/avisiedo/go-microservice-1/internal/test/mock/interface/presenter/echo"
 	"github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus"
@@ -33,7 +34,7 @@ func helperNewContextForSkipper(route string, method string, path string, header
 	return c
 }
 
-func helperNewGroupPublic(t *testing.T) (*echo.Echo, *config.Config, public.ServerInterface, *openapi.ServerInterface, *metrics.Metrics) {
+func helperNewGroupPublic(t *testing.T) (*echo.Echo, *config.Config, public.ServerInterface, openapi.ServerInterface, *metrics.Metrics) {
 	var (
 		err error
 		db  *gorm.DB
@@ -50,7 +51,7 @@ func helperNewGroupPublic(t *testing.T) (*echo.Echo, *config.Config, public.Serv
 	require.NotNil(t, db)
 
 	presenterPublic := presenter.NewTodo(t)
-	presenterOpenAPI := openapi.NewServerInterface(t)
+	presenterOpenAPI := mock_openapi.NewServerInterface(t)
 
 	e := echo.New()
 	public.RegisterHandlers(e.Group(cfg.Application.PathPrefix), presenterPublic)
@@ -213,7 +214,7 @@ func TestNewGroupPublicGroupRegistered(t *testing.T) {
 		t.Logf("HandlerName=%s", testCase.Given.HandlerName)
 		e, cfg, publicPresenter, openAPIPresenter, m := helperNewGroupPublic(t)
 
-		prefix := cfg.Application.PathPrefix + "/v" + majorVersion
+		prefix := cfg.Application.PathPrefix
 		require.NotNil(t, newPublic(e.Group(prefix), cfg, publicPresenter, openAPIPresenter, m))
 
 		result := e.Reverse(testCase.Given.HandlerName, testCase.Given.Params)
