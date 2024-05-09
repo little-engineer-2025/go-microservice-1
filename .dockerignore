@@ -13,13 +13,6 @@ tools/bin
 !requirements-dev.txt
 !requirements.txt
 
-
-# File generated when running unit tests
-coverage.out
-
-# NOTE: .git directory is not listed here. `go build` needs the full `.git`
-# directory to include VCS information in go binaries.
-
 # NOTE DO NOT ADD ANYTHING BELOW THIS LINE
 .docker
 .podman
