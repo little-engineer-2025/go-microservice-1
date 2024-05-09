@@ -14,14 +14,14 @@ endif
 kafka-shell:  ## Open an interactive shell in the kafka container
 	$(COMPOSE_VARS) \
 	KAFKA_OPTS= \
-	$(CONTAINER_COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) \
+	$(COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) \
 	exec kafka /bin/bash
 
 .PHONY: kafka-topics-list
 kafka-topics-list:  ## List the kafka topics from the kafka container
 	$(COMPOSE_VARS) \
 	KAFKA_OPTS= \
-	$(CONTAINER_COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) \
+	$(COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) \
 	exec kafka /opt/kafka/bin/kafka-topics.sh --list --bootstrap-server localhost:9092
 
 .PHONY: kafka-topics-create
@@ -29,7 +29,7 @@ kafka-topics-create:  ## Create the kafka topics in KAFKA_TOPICS
 	for topic in $(KAFKA_TOPICS); do \
 		$(COMPOSE_VARS) \
 		KAFKA_OPTS= \
-		$(CONTAINER_COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) \
+		$(COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) \
 	    exec kafka /opt/kafka/bin/kafka-topics.sh --create --topic $$topic --bootstrap-server localhost:9092; \
 	done
 
@@ -37,7 +37,7 @@ kafka-topics-create:  ## Create the kafka topics in KAFKA_TOPICS
 kafka-topics-describe:  ## Execute kafka-topics.sh for KAFKA_TOPICS
 	for topic in $(KAFKA_TOPICS); do \
 		$(COMPOSE_VARS) \
-		$(CONTAINER_COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) \
+		$(COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) \
 	    exec kafka /opt/kafka/bin/kafka-topics.sh --describe --topic $$topic --bootstrap-server localhost:9092; \
 	done
 
@@ -46,7 +46,7 @@ kafka-topics-describe:  ## Execute kafka-topics.sh for KAFKA_TOPICS
 kafka-topics-offset:  ## Display information about the topic offsets
 	for topic in $(KAFKA_TOPICS); do \
 		$(COMPOSE_VARS) \
-		$(CONTAINER_COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) \
+		$(COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) \
 	    exec kafka \
 		/opt/kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group $(KAFKA_GROUP_ID) --describe; \
 	done
@@ -62,7 +62,7 @@ kafka-consume: KAFKA_TOPIC ?= $(firstword $(KAFKA_TOPICS))
 kafka-consume:  ## Consume on KAFKA_TOPIC (default first from KAFKA_TOPICS) using GROUP_ID
 	@[ "$(KAFKA_TOPIC)" != "" ] || { echo "error:KAFKA_TOPIC cannot be empty"; exit 1; }
 	$(COMPOSE_VARS) \
-	$(CONTAINER_COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) \
+	$(COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) \
 	exec kafka \
 	  /opt/kafka/bin/kafka-console-consumer.sh \
 	  $(KAFKA_PROPERTIES) \

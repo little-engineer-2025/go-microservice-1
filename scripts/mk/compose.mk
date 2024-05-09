@@ -5,10 +5,15 @@
 COMPOSE_PROJECT ?= todo
 
 ifeq (podman,$(CONTAINER_ENGINE))
-CONTAINER_COMPOSE ?= podman-compose
+COMPOSE ?= podman-compose
 CONTAINER_DATABASE_NAME ?= $(COMPOSE_PROJECT)_database_1
-else
-CONTAINER_COMPOSE ?= docker-compose
+endif
+ifeq (docker,$(CONTAINER_ENGINE))
+COMPOSE ?= docker-compose
+CONTAINER_DATABASE_NAME ?= $(COMPOSE_PROJECT)-database-1
+endif
+ifeq (,$(COMPOSE))
+COMPOSE ?= false
 CONTAINER_DATABASE_NAME ?= $(COMPOSE_PROJECT)-database-1
 endif
 
@@ -49,7 +54,7 @@ COMPOSE_VARS= \
 .PHONY: compose-up
 compose-up: ## Start local infrastructure
 	$(COMPOSE_VARS) \
-	    $(CONTAINER_COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) up -d
+	    $(COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) up -d
 	$(MAKE) .compose-wait-db
 	$(MAKE) $(COMPOSE_VARS_DB_MIGRATE) db-migrate-up
 
@@ -64,22 +69,22 @@ compose-up: ## Start local infrastructure
 .PHONY: compose-down
 compose-down: ## Stop local infrastructure
 	$(COMPOSE_VARS) \
-	    $(CONTAINER_COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) down --volumes
+	    $(COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) down --volumes
 
 .PHONY: compose-build
 compose-build: ## Build the images at docker-compose.yaml
 	$(COMPOSE_VARS) \
-	    $(CONTAINER_COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) build
+	    $(COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) build
 
 .PHONY: compose-pull
 compose-pull: ## Pull images
 	$(COMPOSE_VARS) \
-	    $(CONTAINER_COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) pull
+	    $(COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) pull
 
 .PHONY: compose-logs
 compose-logs: ## Print out infrastructure logs
 	$(COMPOSE_VARS) \
-	    $(CONTAINER_COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) logs
+	    $(COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) logs
 
 .PHONY: compose-clean
 compose-clean: compose-down  ## Stop and clean local infrastructure

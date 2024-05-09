@@ -11,7 +11,7 @@ db-migrate-up: $(BIN)/db-tool  ## Migrate the database upto the current state
 
 .PHONY: db-cli
 db-cli:  ## Open a cli shell inside the databse container
-	$(CONTAINER_COMPOSE) \
+	$(COMPOSE) \
 	  -f "$(COMPOSE_FILE)" \
 	  -p "$(COMPOSE_PROJECT)" \
 	  exec database psql \
