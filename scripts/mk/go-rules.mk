@@ -4,6 +4,9 @@
 # the generated binaries.
 ##
 
+GOVERSION := 1.21
+export GOVERSION
+
 ifeq (,$(shell ls -1d vendor 2>/dev/null))
 MOD_VENDOR :=
 else
@@ -60,8 +63,8 @@ run: $(BIN)/service .compose-wait-db ## Run the api & kafka consumer locally
 # See: https://go.dev/doc/modules/managing-dependencies#synchronizing
 .PHONY: tidy
 tidy:  ## Synchronize your code's dependencies
-	go mod tidy -go=1.20
-	cd tools && go mod tidy -go=1.20
+	go mod tidy -go=$(GOVERSION)
+	cd tools && go mod tidy -go=$(GOVERSION)
 
 .PHONY: get-deps
 get-deps: ## Download golang dependencies
@@ -88,13 +91,16 @@ vendor: ## Generate vendor/ directory populated with the dependencies
 # generated.
 # Exclude /vendor in case it exists
 # Exclude /internal/interface directories because only contain interfaces
+TGF_PREFIX := github.com/avisiedo/go-microservice-1
 TEST_GREP_FILTER := -v \
-  -e /vendor/ \
-  -e /internal/test \
-  -e /internal/interface/ \
-  -e /internal/api/metrics \
-  -e /internal/api/private \
-  -e /internal/api/public
+  -e '^$(TGF_PREFIX)/vendor/' \
+  -e '^$(TGF_PREFIX)/internal/test' \
+  -e '^$(TGF_PREFIX)/internal/interface/' \
+  -e '^$(TGF_PREFIX)/internal/api/metrics' \
+  -e '^$(TGF_PREFIX)/internal/api/private' \
+  -e '^$(TGF_PREFIX)/internal/usecase/repository/s3' \
+  -e '^$(TGF_PREFIX)/internal/usecase/repository/event' \
+  -e '^$(TGF_PREFIX)/internal/api/public'
 
 .PHONY: test
 test: test-unit test-integration  ## Run unit tests and integration tests
@@ -196,6 +202,12 @@ generate-mock: $(MOCKERY)  ## Generate mock by using mockery tool
 generate-deps: $(GODA)
 	$(GODA) graph "github.com/avisiedo/go-microservice-1/..." | dot -Tsvg -o docs/service-dependencies.svg
 
+coverage.tmp.out:
+	go test -parallel 4 -coverprofile="coverage.tmp.out" -covermode count $(MOD_VENDOR) $(shell go list ./... | grep $(TEST_GREP_FILTER) )
+
+coverage.out: coverage.tmp.out
+	grep -v -e '.gen.go' coverage.tmp.out > coverage.out
+
 .PHONY: coverage
-coverage:  ## Printout coverage
+coverage:  coverage.out  ## Printout coverage
 	go tool cover -func ./coverage.out

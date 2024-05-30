@@ -21,12 +21,12 @@ CONTAINER_IMAGE_BASE ?= quay.io/$(firstword $(subst +, ,$(QUAY_USER)))/$(APP_NAM
 TOOLS_BIN := tools/bin
 
 GODA := $(TOOLS_BIN)/goda
+# GOJSONSCHEMA not in TOOLS actually
 GOJSONSCHEMA := $(TOOLS_BIN)/gojsonschema
 GOLANGCI_LINT := $(TOOLS_BIN)/golangci-lint
 MOCKERY := $(TOOLS_BIN)/mockery
 OAPI_CODEGEN := $(TOOLS_BIN)/oapi-codegen
 PLANTER := $(TOOLS_BIN)/planter
-XRHIDGEN := $(TOOLS_BIN)/xrhidgen
 YQ := $(TOOLS_BIN)/yq
 
 
@@ -37,7 +37,6 @@ TOOLS := \
 	$(OAPI_CODEGEN) \
 	$(PLANTER) \
 	$(YQ)
-	# $(GOJSONSCHEMA) \
 
 TOOLS_DEPS := tools/go.mod tools/go.sum tools/tools.go | $(TOOLS_BIN)
 
