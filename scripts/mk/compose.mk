@@ -4,17 +4,15 @@
 
 COMPOSE_PROJECT ?= todo
 
+CONTAINER_DATABASE_NAME ?= $(COMPOSE_PROJECT)-database-1
 ifeq (podman,$(CONTAINER_ENGINE))
 COMPOSE ?= podman-compose
-CONTAINER_DATABASE_NAME ?= $(COMPOSE_PROJECT)_database_1
 endif
 ifeq (docker,$(CONTAINER_ENGINE))
 COMPOSE ?= docker-compose
-CONTAINER_DATABASE_NAME ?= $(COMPOSE_PROJECT)-database-1
 endif
 ifeq (,$(COMPOSE))
 COMPOSE ?= false
-CONTAINER_DATABASE_NAME ?= $(COMPOSE_PROJECT)-database-1
 endif
 
 COMPOSE_FILE ?= $(PROJECT_DIR)/deploy/docker-compose.yaml
@@ -53,6 +51,7 @@ COMPOSE_VARS= \
 
 .PHONY: compose-up
 compose-up: ## Start local infrastructure
+	source .venv/bin/activate && \
 	$(COMPOSE_VARS) \
 	    $(COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) up -d
 	$(MAKE) .compose-wait-db
@@ -68,24 +67,29 @@ compose-up: ## Start local infrastructure
 
 .PHONY: compose-down
 compose-down: ## Stop local infrastructure
+	source .venv/bin/activate && \
 	$(COMPOSE_VARS) \
 	    $(COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) down --volumes
 
 .PHONY: compose-build
 compose-build: ## Build the images at docker-compose.yaml
+	source .venv/bin/activate && \
 	$(COMPOSE_VARS) \
 	    $(COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) build
 
 .PHONY: compose-pull
 compose-pull: ## Pull images
+	source .venv/bin/activate && \
 	$(COMPOSE_VARS) \
 	    $(COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) pull
 
 .PHONY: compose-logs
 compose-logs: ## Print out infrastructure logs
+	source .venv/bin/activate && \
 	$(COMPOSE_VARS) \
 	    $(COMPOSE) -f $(COMPOSE_FILE) -p $(COMPOSE_PROJECT) logs
 
 .PHONY: compose-clean
 compose-clean: compose-down  ## Stop and clean local infrastructure
+	source .venv/bin/activate && \
 	$(CONTAINER_ENGINE) volume prune --force
