@@ -174,6 +174,7 @@ MOCK_DIRS := internal/api/http/private \
 	internal/api/http/public \
 	internal/api/http/openapi \
 	internal/api/http/metrics \
+	internal/api/http/healthcheck \
 	internal/interface/presenter/echo \
 	internal/interface/interactor \
 	internal/interface/repository/event \

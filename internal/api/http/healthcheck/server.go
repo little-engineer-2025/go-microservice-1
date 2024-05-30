@@ -22,19 +22,13 @@ type ServerInterfaceWrapper struct {
 
 // GetLivez converts echo context to params.
 func (w *ServerInterfaceWrapper) GetLivez(ctx echo.Context) error {
-	var err error
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetLivez(ctx)
+	err := w.Handler.GetLivez(ctx)
 	return err
 }
 
 // GetReadyz converts echo context to params.
 func (w *ServerInterfaceWrapper) GetReadyz(ctx echo.Context) error {
-	var err error
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetReadyz(ctx)
+	err := w.Handler.GetReadyz(ctx)
 	return err
 }
 
