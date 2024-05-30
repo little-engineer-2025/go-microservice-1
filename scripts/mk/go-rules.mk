@@ -100,7 +100,10 @@ TEST_GREP_FILTER := -v \
   -e '^$(TGF_PREFIX)/internal/api/private' \
   -e '^$(TGF_PREFIX)/internal/usecase/repository/s3' \
   -e '^$(TGF_PREFIX)/internal/usecase/repository/event' \
-  -e '^$(TGF_PREFIX)/internal/api/public'
+  -e '^$(TGF_PREFIX)/internal/api/http/public' \
+  -e '^$(TGF_PREFIX)/internal/api/http/private' \
+  -e '^$(TGF_PREFIX)/internal/api/event' \
+
 
 .PHONY: test
 test: test-unit test-integration  ## Run unit tests and integration tests
