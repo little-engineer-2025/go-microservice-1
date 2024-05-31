@@ -1,12 +1,12 @@
 package echo
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/avisiedo/go-microservice-1/internal/api/http/public"
 	"github.com/avisiedo/go-microservice-1/internal/config"
 	"github.com/avisiedo/go-microservice-1/internal/domain/model"
+	app_context "github.com/avisiedo/go-microservice-1/internal/infrastructure/context"
 	"github.com/avisiedo/go-microservice-1/internal/infrastructure/logger/slogctx"
 	"github.com/avisiedo/go-microservice-1/internal/interface/interactor"
 	presenter "github.com/avisiedo/go-microservice-1/internal/interface/presenter/echo"
@@ -48,7 +48,7 @@ func (p *todoPresenter) GetAllTodos(c echo.Context) error {
 	}
 	if err = p.db.Transaction(func(tx *gorm.DB) error {
 		var err error
-		c := context.WithValue(ctx, "db", tx)
+		c := app_context.WithDB(ctx, tx)
 		if todos, err = p.interactor.GetAll(c); err != nil {
 			l.ErrorContext(ctx, "presenter error at GetAll(): %s", err.Error())
 			return err
@@ -88,7 +88,7 @@ func (p *todoPresenter) CreateTodo(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "description is an empty string")
 	}
 	if err = p.db.Transaction(func(tx *gorm.DB) error {
-		c := context.WithValue(ctx.Request().Context(), "db", tx)
+		c := app_context.WithDB(ctx.Request().Context(), tx)
 		if data, err = p.interactor.Create(c, data); err != nil {
 			l.ErrorContext(ctx.Request().Context(), "presenter error on invoking interactor.Create: %s", err.Error())
 			return err
@@ -124,7 +124,7 @@ func (p *todoPresenter) GetTodo(c echo.Context, todoId openapi_types.UUID) error
 	l := slogctx.FromCtx(ctx)
 	if err = p.db.Transaction(func(tx *gorm.DB) error {
 		var err error
-		c := context.WithValue(ctx, "db", tx)
+		c := app_context.WithDB(ctx, tx)
 		if todo, err = p.interactor.GetByUUID(c, todoId); err != nil {
 			l.ErrorContext(ctx, "todos presenter error at Get(): %s", err.Error())
 			return err
