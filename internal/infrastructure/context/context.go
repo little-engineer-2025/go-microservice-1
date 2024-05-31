@@ -3,17 +3,23 @@ package context
 import (
 	"context"
 
-	"golang.org/x/exp/slog"
+	"log/slog"
+
 	"gorm.io/gorm"
 )
 
+type contextKey int
+
 const (
-	ctxKeyLog = "log"
-	ctxKeyDb  = "db"
+	ctxKeyLog contextKey = 1000
+	ctxKeyDB  contextKey = 1001
 )
 
 // LogFromContext retrieve the identity.XRHID data struct from the context.
 func LogFromContext(ctx context.Context) *slog.Logger {
+	if ctx == nil {
+		return slog.Default()
+	}
 	if data := ctx.Value(ctxKeyLog); data != nil {
 		if log, ok := data.(*slog.Logger); ok {
 			return log
@@ -24,10 +30,23 @@ func LogFromContext(ctx context.Context) *slog.Logger {
 
 // DBFromContext retrieve the gorm.DB data struct from the context.
 func DBFromContext(ctx context.Context) *gorm.DB {
-	if data := ctx.Value(ctxKeyDb); data != nil {
+	if ctx == nil {
+		return nil
+	}
+	if data := ctx.Value(ctxKeyDB); data != nil {
 		if db, ok := data.(*gorm.DB); ok {
 			return db
 		}
 	}
 	return nil
+}
+
+// WithDB create a new context with the provided database value.
+func WithDB(ctx context.Context, value *gorm.DB) context.Context {
+	return context.WithValue(ctx, ctxKeyDB, value)
+}
+
+// WithLog create a new context with the provided log value.
+func WithLog(ctx context.Context, value *slog.Logger) context.Context {
+	return context.WithValue(ctx, ctxKeyLog, value)
 }
