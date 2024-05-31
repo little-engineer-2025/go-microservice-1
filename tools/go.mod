@@ -14,7 +14,7 @@ require (
 	github.com/atombender/go-jsonschema v0.12.1
 	github.com/deepmap/oapi-codegen v1.16.2
 	github.com/golangci/golangci-lint v1.55.2
-	github.com/loov/goda v0.5.7
+	github.com/loov/goda v0.5.8
 	github.com/mikefarah/yq/v4 v4.35.2
 	github.com/vektra/mockery/v2 v2.38.0
 )
