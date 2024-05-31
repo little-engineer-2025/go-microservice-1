@@ -19,10 +19,13 @@ func TestNewHandler(t *testing.T) {
 	assert.Panics(t, func() {
 		NewHandler(nil, nil, nil)
 	})
-	assert.Panics(t, func() {
+	assert.PanicsWithValue(t, "db is nil", func() {
 		NewHandler(&config.Config{}, nil, nil)
 	})
 	cfg := test.GetTestConfig()
+	assert.PanicsWithValue(t, "m is nil", func() {
+		NewHandler(cfg, gormDB, nil)
+	})
 	assert.NotPanics(t, func() {
 		NewHandler(cfg, gormDB, &metrics.Metrics{})
 	})
