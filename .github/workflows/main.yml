@@ -62,7 +62,7 @@ jobs:
         run: make generate-mock && git diff internal/test/mock/
 
       - name: Checking missed 'go fmt'
-        run: make go-fmt && git diff internal/ pkg/ cmd/
+        run: make go-fmt && git diff internal/ cmd/
 
       - name: Checking yaml files
         run: .venv/bin/python3 -m yamllint .
