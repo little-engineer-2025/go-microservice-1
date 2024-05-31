@@ -1,10 +1,11 @@
 package middleware
 
 import (
+	"log/slog"
+
 	"github.com/avisiedo/go-microservice-1/internal/infrastructure/logger/slogctx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"golang.org/x/exp/slog"
 )
 
 type SLogMiddlewareConfig struct {

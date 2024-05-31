@@ -2,9 +2,8 @@ package router
 
 import (
 	"fmt"
+	"log/slog"
 	"strings"
-
-	"golang.org/x/exp/slog"
 
 	"github.com/avisiedo/go-microservice-1/internal/api/http/healthcheck"
 	metrics_handler "github.com/avisiedo/go-microservice-1/internal/api/http/metrics"

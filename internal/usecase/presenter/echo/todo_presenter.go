@@ -43,23 +43,23 @@ func (p *todoPresenter) GetAllTodos(c echo.Context) error {
 	l := slogctx.FromCtx(ctx)
 	// l := slog.Default()
 	if err = p.input.GetAll(c); err != nil {
-		l.ErrorContext(ctx, "presenter input adapter error at GetAll(): %s", err.Error())
+		l.ErrorContext(ctx, err.Error())
 		return err
 	}
 	if err = p.db.Transaction(func(tx *gorm.DB) error {
 		var err error
 		c := app_context.WithDB(ctx, tx)
 		if todos, err = p.interactor.GetAll(c); err != nil {
-			l.ErrorContext(ctx, "presenter error at GetAll(): %s", err.Error())
+			l.ErrorContext(ctx, err.Error())
 			return err
 		}
 		return nil
 	}); err != nil {
-		l.ErrorContext(ctx, "transaction error at GetAll(): %s", err.Error())
+		l.ErrorContext(ctx, err.Error())
 		return err
 	}
 	if output, err = p.output.GetAll(c, todos); err != nil {
-		l.ErrorContext(ctx, "presenter output adapter error at GetAll(): %s", err.Error())
+		l.ErrorContext(ctx, err.Error())
 		return err
 	}
 	return c.JSON(http.StatusOK, output)
@@ -90,7 +90,7 @@ func (p *todoPresenter) CreateTodo(ctx echo.Context) error {
 	if err = p.db.Transaction(func(tx *gorm.DB) error {
 		c := app_context.WithDB(ctx.Request().Context(), tx)
 		if data, err = p.interactor.Create(c, data); err != nil {
-			l.ErrorContext(ctx.Request().Context(), "presenter error on invoking interactor.Create: %s", err.Error())
+			l.ErrorContext(ctx.Request().Context(), err.Error())
 			return err
 		}
 		return nil
@@ -98,7 +98,7 @@ func (p *todoPresenter) CreateTodo(ctx echo.Context) error {
 		return err
 	}
 	if output, err = p.output.Create(ctx, data); err != nil {
-		l.ErrorContext(ctx.Request().Context(), "presenter output adapter error at todo.Create(): %s", err.Error())
+		l.ErrorContext(ctx.Request().Context(), err.Error())
 		return err
 	}
 	return ctx.JSON(http.StatusCreated, output)
@@ -126,16 +126,16 @@ func (p *todoPresenter) GetTodo(c echo.Context, todoId openapi_types.UUID) error
 		var err error
 		c := app_context.WithDB(ctx, tx)
 		if todo, err = p.interactor.GetByUUID(c, todoId); err != nil {
-			l.ErrorContext(ctx, "todos presenter error at Get(): %s", err.Error())
+			l.ErrorContext(ctx, err.Error())
 			return err
 		}
 		return nil
 	}); err != nil {
-		l.ErrorContext(ctx, "transaction error at Get(): %s", err.Error())
+		l.ErrorContext(ctx, err.Error())
 		return err
 	}
 	if output, err = p.output.Get(c, todo); err != nil {
-		l.ErrorContext(ctx, "presenter output adapter error at Get(): %s", err.Error())
+		l.ErrorContext(ctx, err.Error())
 		return err
 	}
 	return c.JSON(http.StatusOK, output)

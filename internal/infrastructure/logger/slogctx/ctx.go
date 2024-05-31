@@ -6,7 +6,7 @@ package slogctx
 import (
 	"context"
 
-	"golang.org/x/exp/slog"
+	"log/slog"
 )
 
 const ctxKeySlog = "slog"

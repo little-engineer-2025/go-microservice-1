@@ -7,13 +7,13 @@
 package config
 
 import (
+	"log/slog"
 	"os"
 	"strings"
 	"sync"
 
 	validator "github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
-	"golang.org/x/exp/slog"
 	"k8s.io/utils/env"
 )
 

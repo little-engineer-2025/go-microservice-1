@@ -8,10 +8,11 @@ import (
 	"strings"
 	"time"
 
+	"log/slog"
+
 	"github.com/avisiedo/go-microservice-1/internal/config"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"golang.org/x/exp/slog"
 )
 
 const dbMirationScriptPath = "./scripts/db/migrations"

@@ -6,12 +6,13 @@ import (
 	"net/http"
 	"sync"
 
+	"log/slog"
+
 	"github.com/avisiedo/go-microservice-1/internal/config"
 	handler "github.com/avisiedo/go-microservice-1/internal/handler/http"
 	"github.com/avisiedo/go-microservice-1/internal/infrastructure/router"
 	"github.com/avisiedo/go-microservice-1/internal/infrastructure/service"
 	"github.com/labstack/echo/v4"
-	"golang.org/x/exp/slog"
 )
 
 type metricsService struct {

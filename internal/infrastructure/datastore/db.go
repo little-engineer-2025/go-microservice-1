@@ -4,12 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 
+	"log/slog"
+
 	"github.com/avisiedo/go-microservice-1/internal/config"
 	"github.com/avisiedo/go-microservice-1/internal/infrastructure/logger"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"golang.org/x/exp/slog"
 	pg "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

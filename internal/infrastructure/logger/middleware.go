@@ -1,10 +1,11 @@
 package logger
 
 import (
+	"log/slog"
+
 	"github.com/avisiedo/go-microservice-1/internal/api/header"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"golang.org/x/exp/slog"
 )
 
 // This requires the following values to be set in

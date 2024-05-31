@@ -7,7 +7,8 @@ import (
 	"runtime"
 	"time"
 
-	"golang.org/x/exp/slog"
+	"log/slog"
+
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )

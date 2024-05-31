@@ -1,12 +1,12 @@
 package logger
 
 import (
+	"log/slog"
 	"os"
 	"runtime/debug"
 	"strings"
 
 	"github.com/avisiedo/go-microservice-1/internal/config"
-	"golang.org/x/exp/slog"
 )
 
 // If you want to learn more about slog visit:
