@@ -70,3 +70,11 @@ func TestReadEnv(t *testing.T) {
 	require.NoError(t, os.Setenv("TEST", "nodefault"))
 	assert.Equal(t, "nodefault", readEnv("TEST", "default"))
 }
+
+func TestGet(t *testing.T) {
+	var c *Config
+	require.NotPanics(t, func() {
+		c = Get()
+	})
+	require.NotNil(t, c)
+}
