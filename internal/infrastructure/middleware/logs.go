@@ -3,7 +3,7 @@ package middleware
 import (
 	"log/slog"
 
-	"github.com/avisiedo/go-microservice-1/internal/infrastructure/logger/slogctx"
+	app_context "github.com/avisiedo/go-microservice-1/internal/infrastructure/context"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -27,13 +27,13 @@ func SLogMiddlewareWithConfig(config *SLogMiddlewareConfig) echo.MiddlewareFunc 
 				return next(c)
 			}
 			req := c.Request()
-			c.SetRequest(req.WithContext(slogctx.NewCtx(req.Context(), config.Log)))
+			c.SetRequest(req.WithContext(app_context.WithLog(req.Context(), config.Log)))
 
 			// Invoke next middleware
 			err := next(c)
 
 			// Log status
-			l := slogctx.FromCtx(c.Request().Context())
+			l := app_context.LogFromContext(c.Request().Context())
 			if err != nil {
 				l.ErrorContext(
 					c.Request().Context(),

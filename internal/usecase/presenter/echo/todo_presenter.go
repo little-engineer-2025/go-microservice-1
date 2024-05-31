@@ -7,7 +7,6 @@ import (
 	"github.com/avisiedo/go-microservice-1/internal/config"
 	"github.com/avisiedo/go-microservice-1/internal/domain/model"
 	app_context "github.com/avisiedo/go-microservice-1/internal/infrastructure/context"
-	"github.com/avisiedo/go-microservice-1/internal/infrastructure/logger/slogctx"
 	"github.com/avisiedo/go-microservice-1/internal/interface/interactor"
 	presenter "github.com/avisiedo/go-microservice-1/internal/interface/presenter/echo"
 	"github.com/avisiedo/go-microservice-1/internal/usecase/presenter/echo/input"
@@ -40,26 +39,28 @@ func (p *todoPresenter) GetAllTodos(c echo.Context) error {
 		err    error
 	)
 	ctx := c.Request().Context()
-	l := slogctx.FromCtx(ctx)
-	// l := slog.Default()
 	if err = p.input.GetAll(c); err != nil {
-		l.ErrorContext(ctx, err.Error())
+		app_context.LogFromContext(ctx).
+			ErrorContext(ctx, err.Error())
 		return err
 	}
 	if err = p.db.Transaction(func(tx *gorm.DB) error {
 		var err error
 		c := app_context.WithDB(ctx, tx)
 		if todos, err = p.interactor.GetAll(c); err != nil {
-			l.ErrorContext(ctx, err.Error())
+			app_context.LogFromContext(ctx).
+				ErrorContext(ctx, err.Error())
 			return err
 		}
 		return nil
 	}); err != nil {
-		l.ErrorContext(ctx, err.Error())
+		app_context.LogFromContext(ctx).
+			ErrorContext(ctx, err.Error())
 		return err
 	}
 	if output, err = p.output.GetAll(c, todos); err != nil {
-		l.ErrorContext(ctx, err.Error())
+		app_context.LogFromContext(ctx).
+			ErrorContext(ctx, err.Error())
 		return err
 	}
 	return c.JSON(http.StatusOK, output)
@@ -74,7 +75,6 @@ func (p *todoPresenter) CreateTodo(ctx echo.Context) error {
 		err    error
 	)
 
-	l := slogctx.FromCtx(ctx.Request().Context())
 	if data, err = p.input.Create(ctx); err != nil {
 		return err
 	}
@@ -90,7 +90,8 @@ func (p *todoPresenter) CreateTodo(ctx echo.Context) error {
 	if err = p.db.Transaction(func(tx *gorm.DB) error {
 		c := app_context.WithDB(ctx.Request().Context(), tx)
 		if data, err = p.interactor.Create(c, data); err != nil {
-			l.ErrorContext(ctx.Request().Context(), err.Error())
+			app_context.LogFromContext(c).
+				ErrorContext(c, err.Error())
 			return err
 		}
 		return nil
@@ -98,7 +99,9 @@ func (p *todoPresenter) CreateTodo(ctx echo.Context) error {
 		return err
 	}
 	if output, err = p.output.Create(ctx, data); err != nil {
-		l.ErrorContext(ctx.Request().Context(), err.Error())
+		c := ctx.Request().Context()
+		app_context.LogFromContext(c).
+			ErrorContext(c, err.Error())
 		return err
 	}
 	return ctx.JSON(http.StatusCreated, output)
@@ -106,9 +109,10 @@ func (p *todoPresenter) CreateTodo(ctx echo.Context) error {
 
 // Remove item by ID
 // (DELETE /todos/{todoId})
-func (p *todoPresenter) DeleteTodo(ctx echo.Context, todoId openapi_types.UUID) error {
-	l := slogctx.FromCtx(ctx.Request().Context())
-	l.ErrorContext(ctx.Request().Context(), "not implemented")
+func (p *todoPresenter) DeleteTodo(c echo.Context, todoId openapi_types.UUID) error {
+	ctx := c.Request().Context()
+	app_context.LogFromContext(ctx).
+		ErrorContext(ctx, "not implemented")
 	return echo.ErrNotImplemented
 }
 
@@ -121,21 +125,23 @@ func (p *todoPresenter) GetTodo(c echo.Context, todoId openapi_types.UUID) error
 		err    error
 	)
 	ctx := c.Request().Context()
-	l := slogctx.FromCtx(ctx)
 	if err = p.db.Transaction(func(tx *gorm.DB) error {
 		var err error
 		c := app_context.WithDB(ctx, tx)
 		if todo, err = p.interactor.GetByUUID(c, todoId); err != nil {
-			l.ErrorContext(ctx, err.Error())
+			app_context.LogFromContext(ctx).
+				ErrorContext(ctx, err.Error())
 			return err
 		}
 		return nil
 	}); err != nil {
-		l.ErrorContext(ctx, err.Error())
+		app_context.LogFromContext(ctx).
+			ErrorContext(ctx, err.Error())
 		return err
 	}
 	if output, err = p.output.Get(c, todo); err != nil {
-		l.ErrorContext(ctx, err.Error())
+		app_context.LogFromContext(ctx).
+			ErrorContext(ctx, err.Error())
 		return err
 	}
 	return c.JSON(http.StatusOK, output)
@@ -143,16 +149,18 @@ func (p *todoPresenter) GetTodo(c echo.Context, todoId openapi_types.UUID) error
 
 // Patch an existing ToDo item
 // (PATCH /todos/{todoId})
-func (p *todoPresenter) PatchTodo(ctx echo.Context, todoId openapi_types.UUID) error {
-	l := slogctx.FromCtx(ctx.Request().Context())
-	l.ErrorContext(ctx.Request().Context(), "not implemented")
+func (p *todoPresenter) PatchTodo(c echo.Context, todoId openapi_types.UUID) error {
+	ctx := c.Request().Context()
+	app_context.LogFromContext(ctx).
+		ErrorContext(ctx, "not implemented")
 	return echo.ErrNotImplemented
 }
 
 // Substitute an existing ToDo item
 // (PUT /todos/{todoId})
-func (p *todoPresenter) UpdateTodo(ctx echo.Context, todoId openapi_types.UUID) error {
-	l := slogctx.FromCtx(ctx.Request().Context())
-	l.ErrorContext(ctx.Request().Context(), "not implemented")
+func (p *todoPresenter) UpdateTodo(c echo.Context, todoId openapi_types.UUID) error {
+	ctx := c.Request().Context()
+	app_context.LogFromContext(ctx).
+		ErrorContext(ctx, "not implemented")
 	return echo.ErrNotImplemented
 }
