@@ -7,10 +7,9 @@
 package config
 
 import (
-	"encoding/json"
-	"fmt"
 	"os"
 	"strings"
+	"sync"
 
 	validator "github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
@@ -112,7 +111,10 @@ type Application struct {
 	ValidateAPI bool `mapstructure:"validate_api"`
 }
 
-var config *Config = nil
+var (
+	config *Config = nil
+	once   sync.Once
+)
 
 func setDefaults(v *viper.Viper) {
 	if v == nil {
@@ -200,25 +202,15 @@ func Validate(cfg *Config) (err error) {
 
 // Get is a singleton to get the global loaded configuration.
 func Get() *Config {
-	if config != nil {
-		return config
-	}
-	config = &Config{}
-	_ = Load(config)
-
-	// Dump configuration as JSON
-	if config.Logging.Level == "debug" {
-		b, err := json.MarshalIndent(config, "", "  ")
-		if err != nil {
-			panic(err)
+	once.Do(func() {
+		config = &Config{}
+		_ = Load(config)
+		if err := Validate(config); err != nil {
+			reportError(err)
+			panic("Invalid configuration")
 		}
-		fmt.Println(string(b))
-	}
+	})
 
-	if err := Validate(config); err != nil {
-		reportError(err)
-		panic("Invalid configuration")
-	}
 	return config
 }
 
