@@ -10,6 +10,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/avisiedo/go-microservice-1/internal/config"
 	model "github.com/avisiedo/go-microservice-1/internal/domain/model"
+	app_context "github.com/avisiedo/go-microservice-1/internal/infrastructure/context"
 	"github.com/avisiedo/go-microservice-1/internal/test"
 	"github.com/avisiedo/go-microservice-1/internal/test/builder/helper"
 	builder "github.com/avisiedo/go-microservice-1/internal/test/builder/model"
@@ -40,7 +41,7 @@ func (s *SuiteTodo) SetupTest() {
 		s.Suite.FailNow("Error calling gorm.Open: %s", err.Error())
 		return
 	}
-	s.ctx = ContextWithDb(context.Background(), s.DB)
+	s.ctx = app_context.WithDB(context.Background(), s.DB)
 	s.repository = &todoRepository{}
 }
 
