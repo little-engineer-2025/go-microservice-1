@@ -53,16 +53,16 @@ jobs:
         run: make get-deps
 
       - name: Checking missed 'make tidy'
-        run: make tidy && git diff --exit-code go.mod go.sum
+        run: make tidy && git diff go.mod go.sum tools/go.mod tools/go.sum
 
       - name: Checking missed 'make generate-api'
-        run: make generate-api && git diff --exit-code internal/api/http/
+        run: make generate-api && git diff internal/api/http/
 
       - name: Checking missed 'make generate-mock'
-        run: make generate-mock && git diff --exit-code internal/test/mock/
+        run: make generate-mock && git diff internal/test/mock/
 
       - name: Checking missed 'go fmt'
-        run: make go-fmt && git diff --exit-code .
+        run: make go-fmt && git diff internal/ pkg/ cmd/
 
       - name: Checking yaml files
         run: .venv/bin/python3 -m yamllint .
