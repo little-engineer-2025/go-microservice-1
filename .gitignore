@@ -1,24 +1,32 @@
-.DS_Store
-secrets
-.venv
-tools/bin
-bin
+# Ignore by default
+**
 
-/api/node_modules
-/node_modules
-/docs
+# Add specific files
+!go.mod
+!go.sum
 
-/api/.venv
+!/requirements.txt
+!/requirements-dev.txt
 
-*.log
+!/cmd
+!/internal
+!/pkg
+!/scripts
+!/test
+!/tools
+/tools/bin
+!/api
+!/docs
+!/build
+!/deploy
 
-configs/**
-!configs/config.example.yaml
-!configs/config.ci.yaml
-!configs/bonfire.example.yaml
-!configs/cdappconfig.json
-!configs/mockery.yaml
+!/configs/config.example.yaml
+!/configs/config.ci.yaml
+!/configs/bonfire.example.yaml
+!/configs/cdappconfig.json
+!/configs/mockery.yaml
 
-# File generated when running unit tests
-coverage.out
-
+# NOTE DO NOT ADD ANYTHING AFTER THIS LINE
+.docker
+.podman
+.kube
