@@ -16,7 +16,7 @@ import (
 
 const DbMigrationPath = "./scripts/db/migrations"
 
-func getUrl(config *config.Config) string {
+func getURL(config *config.Config) string {
 	var sslStr string
 	if config.Database.CACertPath == "" {
 		sslStr = "sslmode=disable"
@@ -33,11 +33,18 @@ func getUrl(config *config.Config) string {
 	)
 }
 
+// NewDB return a new gorm database connector.
+// cfg provides the database connection information.
+// return a gorm.DB instance if success, nil on error and
+// panic on invalid input arguments.
 func NewDB(cfg *config.Config) (db *gorm.DB) {
+	if cfg == nil {
+		panic("'cfg' is nil")
+	}
 	var err error
-	dbUrl := getUrl(cfg)
+	dbURL := getURL(cfg)
 
-	if db, err = gorm.Open(pg.Open(dbUrl),
+	if db, err = gorm.Open(pg.Open(dbURL),
 		&gorm.Config{
 			Logger:                 logger.NewGormLog(true),
 			SkipDefaultTransaction: true,
@@ -52,7 +59,7 @@ func NewDB(cfg *config.Config) (db *gorm.DB) {
 
 func NewDbMigration(config *config.Config) (db *gorm.DB, m *migrate.Migrate, err error) {
 	var sqlDb *sql.DB
-	dbURL := getUrl(config)
+	dbURL := getURL(config)
 	sqlDb, err = sql.Open("postgres", dbURL)
 	if err != nil {
 		return nil, nil, fmt.Errorf("could not connect to database: %w", err)
