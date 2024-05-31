@@ -1,32 +1,14 @@
-# Ignore by default
-**
-
-# Add specific files
-!go.mod
-!go.sum
-
-!/requirements.txt
-!/requirements-dev.txt
-
-!/cmd
-!/internal
-!/pkg
-!/scripts
-!/test
-!/tools
+.DS_Store
+.venv
+/bin
 /tools/bin
-!/api
-!/docs
-!/build
-!/deploy
 
-!/configs/config.example.yaml
-!/configs/config.ci.yaml
-!/configs/bonfire.example.yaml
-!/configs/cdappconfig.json
-!/configs/mockery.yaml
+/coverage.out
+/coverage.tmp.out
 
-# NOTE DO NOT ADD ANYTHING AFTER THIS LINE
+
+# Secrets
+/secrets
 .docker
 .podman
 .kube
