@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log/slog"
 	"os"
 	"os/signal"
 	"sync"
@@ -32,7 +33,7 @@ func main() {
 	logger.LogBuildInfo("idmscv-backend")
 	cfg := config.Get()
 	logger.InitLogger(cfg)
-	db := datastore.NewDB(cfg)
+	db := datastore.NewDB(cfg, slog.Default())
 	defer datastore.Close(db)
 
 	ctx, cancel := startSignalHandler(context.Background())

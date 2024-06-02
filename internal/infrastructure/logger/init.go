@@ -11,6 +11,7 @@ import (
 
 // If you want to learn more about slog visit:
 // https://betterstack.com/community/guides/logging/logging-in-go/
+// https://pkg.go.dev/golang.org/x/example/slog-handler-guide
 
 const (
 	LevelTrace  = slog.Level(-8)
@@ -19,6 +20,7 @@ const (
 	LevelNotice = slog.Level(2)
 	LevelWarn   = slog.LevelWarn
 	LevelError  = slog.LevelError
+	LevelSilent = slog.Level(12)
 )
 
 type AppHandler struct {

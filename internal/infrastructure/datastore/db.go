@@ -38,16 +38,19 @@ func getURL(config *config.Config) string {
 // cfg provides the database connection information.
 // return a gorm.DB instance if success, nil on error and
 // panic on invalid input arguments.
-func NewDB(cfg *config.Config) (db *gorm.DB) {
+func NewDB(cfg *config.Config, sl *slog.Logger) (db *gorm.DB) {
 	if cfg == nil {
 		panic("'cfg' is nil")
+	}
+	if sl == nil {
+		sl = slog.Default()
 	}
 	var err error
 	dbURL := getURL(cfg)
 
 	if db, err = gorm.Open(pg.Open(dbURL),
 		&gorm.Config{
-			Logger:                 logger.NewGormLog(true),
+			Logger:                 logger.NewGormLog(sl, true),
 			SkipDefaultTransaction: true,
 			// CreateBatchSize:        50,
 			TranslateError: true,

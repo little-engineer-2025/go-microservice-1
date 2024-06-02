@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -67,7 +68,7 @@ func (s *Suite) SetupTest() {
 	s.cfg = config.Get()
 	s.wg = &sync.WaitGroup{}
 	logger.InitLogger(s.cfg)
-	s.db = datastore.NewDB(s.cfg)
+	s.db = datastore.NewDB(s.cfg, slog.Default())
 	s.mocks = map[string]service.ApplicationService{}
 
 	ctx, cancel := StartSignalHandler(context.Background())

@@ -4,15 +4,17 @@
 
 COMPOSE_PROJECT ?= todo
 
-CONTAINER_DATABASE_NAME ?= $(COMPOSE_PROJECT)-database-1
 ifeq (podman,$(CONTAINER_ENGINE))
 COMPOSE ?= podman-compose
+CONTAINER_DATABASE_NAME ?= $(COMPOSE_PROJECT)_database_1
 endif
 ifeq (docker,$(CONTAINER_ENGINE))
 COMPOSE ?= docker-compose
+CONTAINER_DATABASE_NAME ?= $(COMPOSE_PROJECT)-database-1
 endif
 ifeq (,$(COMPOSE))
 COMPOSE ?= false
+CONTAINER_DATABASE_NAME ?= $(COMPOSE_PROJECT)-database-1
 endif
 
 COMPOSE_FILE ?= $(PROJECT_DIR)/deploy/docker-compose.yaml

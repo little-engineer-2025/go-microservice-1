@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/avisiedo/go-microservice-1/internal/api/header"
+	// "github.com/avisiedo/go-microservice-1/internal/infrastructure/logger"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -22,13 +23,13 @@ func MiddlewareLogValues(c echo.Context, v middleware.RequestLoggerValues) error
 	req := c.Request()
 	res := c.Response()
 
-	request_id := req.Header.Get(header.HdrRequestID)
-	if request_id == "" {
-		request_id = res.Header().Get(header.HdrRequestID)
+	requestID := req.Header.Get(header.HdrRequestID)
+	if requestID == "" {
+		requestID = res.Header().Get(header.HdrRequestID)
 	}
 
 	logAttr = append(logAttr,
-		slog.String("request_id", request_id),
+		slog.String("request-id", requestID),
 		slog.String("method", v.Method),
 		slog.String("uri", v.URI),
 		slog.Int("status", v.Status),

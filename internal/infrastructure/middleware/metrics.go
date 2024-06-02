@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/avisiedo/go-microservice-1/internal/infrastructure/metrics"
@@ -19,23 +20,6 @@ var defaultConfig MetricsConfig = MetricsConfig{
 	Metrics: metrics.NewMetrics(prometheus.NewRegistry()),
 }
 
-func mapStatus(status int) string {
-	switch {
-	case status >= 100 && status < 200:
-		return "1xx"
-	case status >= 200 && status < 300:
-		return "2xx"
-	case status >= 300 && status < 400:
-		return "3xx"
-	case status >= 400 && status < 500:
-		return "4xx"
-	case status >= 500 && status < 600:
-		return "5xx"
-	default:
-		return ""
-	}
-}
-
 func MetricsMiddlewareWithConfig(config *MetricsConfig) echo.MiddlewareFunc {
 	if config == nil {
 		config = &defaultConfig
@@ -49,13 +33,13 @@ func MetricsMiddlewareWithConfig(config *MetricsConfig) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(ctx echo.Context) error {
 			start := time.Now()
-			if config.Skipper != nil && config.Skipper(ctx) {
+			if config.Skipper(ctx) {
 				return next(ctx)
 			}
 			method := ctx.Request().Method
 			path := MatchedRoute(ctx)
 			err := next(ctx)
-			status := mapStatus(ctx.Response().Status)
+			status := strconv.Itoa(ctx.Response().Status)
 			config.Metrics.HttpStatusHistogram.WithLabelValues(status, method, path).Observe(time.Since(start).Seconds())
 			return err
 		}

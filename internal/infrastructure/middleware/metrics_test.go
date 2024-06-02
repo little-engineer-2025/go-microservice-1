@@ -26,27 +26,6 @@ func TestCreateMetricsMiddleware(t *testing.T) {
 	assert.NotNil(t, middleware)
 }
 
-func TestMapStatus(t *testing.T) {
-	type TestCase struct {
-		Name     string
-		Given    int
-		Expected string
-	}
-	testCases := []TestCase{
-		{Name: "0", Given: 0, Expected: ""},
-		{Name: "1xx", Given: http.StatusContinue, Expected: "1xx"},
-		{Name: "2xx", Given: http.StatusOK, Expected: "2xx"},
-		{Name: "3xx", Given: http.StatusMultipleChoices, Expected: "3xx"},
-		{Name: "4xx", Given: http.StatusBadRequest, Expected: "4xx"},
-		{Name: "5xx", Given: http.StatusInternalServerError, Expected: "5xx"},
-	}
-
-	for _, testCase := range testCases {
-		result := mapStatus(testCase.Given)
-		assert.Equal(t, testCase.Expected, result)
-	}
-}
-
 func TestMetricsMiddlewareWithConfigCreation(t *testing.T) {
 	var (
 		reg    *prometheus.Registry
@@ -65,7 +44,7 @@ func TestMetricsMiddlewareWithConfigCreation(t *testing.T) {
 	config = &MetricsConfig{
 		Metrics: metrics.NewMetrics(reg),
 		Skipper: func(c echo.Context) bool {
-			return c.Path() == "/ping"
+			return c.Request().URL.Path == "/ping"
 		},
 	}
 
@@ -87,10 +66,16 @@ func TestMetricsMiddlewareWithConfigCreation(t *testing.T) {
 	path := "/api/todo/v1/todos/"
 	e.Add(http.MethodGet, path, h)
 
+	// Check normal request
 	resp := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, path, nil)
 	e.ServeHTTP(resp, req)
 
 	assert.Equal(t, http.StatusOK, resp.Code)
 	assert.Equal(t, "Ok", resp.Body.String())
+
+	// Check skipper
+	resp = httptest.NewRecorder()
+	req = httptest.NewRequest(http.MethodGet, "/ping", nil)
+	e.ServeHTTP(resp, req)
 }

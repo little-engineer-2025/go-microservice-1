@@ -4,10 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"runtime"
 	"time"
-
-	"log/slog"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -19,8 +18,8 @@ type gormLogger struct {
 	IgnoreRecordNotFoundError bool
 }
 
-// _LogCommon This function creates slog messages with correct source code locations
-func (l *gormLogger) _LogCommon(
+// logCommon This function creates slog messages with correct source code locations
+func (l *gormLogger) logCommon(
 	ctx context.Context,
 	level slog.Level,
 	msg string,
@@ -40,38 +39,40 @@ func (l *gormLogger) _LogCommon(
 
 // GORM uses these log messages in the form:
 // Info(ctx, "wurst `%s` from %s\n", brot, utils.FileWithLineNum())
-func (l *gormLogger) _LogMsg(
+func (l *gormLogger) logMsg(
 	ctx context.Context,
 	level slog.Level,
 	msg string,
 	args ...interface{},
 ) {
-	l._LogCommon(ctx, level, fmt.Sprintf(msg, args...))
+	l.logCommon(ctx, level, fmt.Sprintf(msg, args...))
 }
 
-func (l *gormLogger) _Log(
+func (l *gormLogger) log(
 	ctx context.Context,
 	level slog.Level,
 	msg string,
 	args ...interface{},
 ) {
-	l._LogCommon(ctx, level, msg, args...)
+	l.logCommon(ctx, level, msg, args...)
 }
 
 func (l *gormLogger) LogMode(level logger.LogLevel) logger.Interface {
+	// The log level here is ignored because the one to use
+	// is the level set on the slog instance used.
 	return l
 }
 
 func (l *gormLogger) Info(ctx context.Context, msg string, args ...interface{}) {
-	l._LogMsg(ctx, slog.LevelInfo, msg, args...)
+	l.logMsg(ctx, slog.LevelInfo, msg, args...)
 }
 
 func (l *gormLogger) Warn(ctx context.Context, msg string, args ...interface{}) {
-	l._LogMsg(ctx, slog.LevelWarn, msg, args...)
+	l.logMsg(ctx, slog.LevelWarn, msg, args...)
 }
 
 func (l *gormLogger) Error(ctx context.Context, msg string, args ...interface{}) {
-	l._LogMsg(ctx, slog.LevelError, msg, args...)
+	l.logMsg(ctx, slog.LevelError, msg, args...)
 }
 
 func (l *gormLogger) Trace(
@@ -86,7 +87,7 @@ func (l *gormLogger) Trace(
 		!l.IgnoreRecordNotFoundError) {
 		sql, rows := fc()
 
-		l._Log(
+		l.log(
 			ctx,
 			LevelTrace,
 			err.Error(),
@@ -95,23 +96,31 @@ func (l *gormLogger) Trace(
 			slog.Duration("elapsed", elapsedTime),
 			slog.Int64("rows", rows),
 		)
-	} else {
-		sql, rows := fc()
-
-		l._Log(
-			ctx,
-			LevelTrace,
-			"SQL query executed",
-			slog.String("query", sql),
-			slog.Duration("elapsed", elapsedTime),
-			slog.Int64("rows", rows),
-		)
+		return
 	}
+	sql, rows := fc()
+
+	l.log(
+		ctx,
+		LevelTrace,
+		"SQL query executed",
+		slog.String("query", sql),
+		slog.Duration("elapsed", elapsedTime),
+		slog.Int64("rows", rows),
+	)
 }
 
-func NewGormLog(ignoreRecordNotFound bool) logger.Interface {
+// NewGormLog use slog to inject the gorm logs on it
+// sl is the slog to use to send the messages.
+// ignoreRecordNotFound when it is true, no trace is logged
+// when a record is not found.
+// Return a logger.Interface initialized
+func NewGormLog(sl *slog.Logger, ignoreRecordNotFound bool) logger.Interface {
+	if sl == nil {
+		sl = slog.Default()
+	}
 	return &gormLogger{
-		slogger:                   slog.Default(),
-		IgnoreRecordNotFoundError: true,
+		slogger:                   sl,
+		IgnoreRecordNotFoundError: ignoreRecordNotFound,
 	}
 }

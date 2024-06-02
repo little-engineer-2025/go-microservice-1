@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"log/slog"
 	"testing"
 
 	"github.com/avisiedo/go-microservice-1/internal/config"
@@ -43,13 +44,13 @@ func TestGetURL(t *testing.T) {
 
 func TestNewDB(t *testing.T) {
 	assert.PanicsWithValue(t, "'cfg' is nil", func() {
-		_ = NewDB(nil)
+		_ = NewDB(nil, slog.Default())
 	})
 
 	cfg := helperConfig()
 	cfg.Database.Port = 2345
 	require.NotNil(t, cfg)
-	db := NewDB(cfg)
+	db := NewDB(cfg, slog.Default())
 	require.Nil(t, db)
 }
 
