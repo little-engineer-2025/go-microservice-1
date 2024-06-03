@@ -64,3 +64,13 @@ func NewContextWithContext(ctx context.Context, e *echo.Echo, method, path strin
 func NewContext(e *echo.Echo, method, path string, headers http.Header, body interface{}) echo.Context {
 	return NewContextWithContext(context.Background(), e, method, path, headers, body)
 }
+
+// NewHandler create a demo handler
+func NewHandler(status int, response any, err error) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if err != nil {
+			return err
+		}
+		return c.JSON(status, response)
+	}
+}
