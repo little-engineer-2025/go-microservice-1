@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/avisiedo/go-microservice-1/internal/domain/model"
+	"github.com/avisiedo/go-microservice-1/internal/test/builder/helper"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -22,7 +23,15 @@ type todo model.Todo
 
 // NewTodo create builder instance to build Todo model components
 func NewTodo() Todo {
-	return &todo{}
+	dueDate := &time.Time{}
+	*dueDate = helper.GenFutureNearTimeUTC(time.Hour)
+	return &todo{
+		Model:       NewModel().Build(),
+		UUID:        uuid.New(),
+		Title:       helper.GenRandTitle(),
+		Description: helper.GenRandDescription(),
+		DueDate:     dueDate,
+	}
 }
 
 func (b *todo) Build() *model.Todo {

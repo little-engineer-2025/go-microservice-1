@@ -2,6 +2,7 @@ package context
 
 import (
 	"context"
+	"errors"
 
 	"log/slog"
 
@@ -29,16 +30,16 @@ func LogFromContext(ctx context.Context) *slog.Logger {
 }
 
 // DBFromContext retrieve the gorm.DB data struct from the context.
-func DBFromContext(ctx context.Context) *gorm.DB {
+func DBFromContext(ctx context.Context) (*gorm.DB, error) {
 	if ctx == nil {
-		return nil
+		return nil, errors.New("'ctx' is nil")
 	}
 	if data := ctx.Value(ctxKeyDB); data != nil {
 		if db, ok := data.(*gorm.DB); ok {
-			return db
+			return db, nil
 		}
 	}
-	return nil
+	return nil, errors.New("database not found in context")
 }
 
 // WithDB create a new context with the provided database value.

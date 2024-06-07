@@ -86,6 +86,13 @@ func (s *SuiteTodo) helperTestCreateTodo(stage int, data *model.Todo, mock sqlmo
 	}
 }
 
+func (s *SuiteTodo) TestCreateTodoNil() {
+	t := s.Suite.T()
+	s.helperTestCreateTodo(0, nil, s.mock, nil)
+	_, err := s.repository.Create(s.ctx, nil)
+	require.EqualError(t, err, "'todo' is nil")
+}
+
 func (s *SuiteTodo) TestCreateTodo() {
 	t := s.Suite.T()
 	// testUuid := uuid.New()
@@ -117,4 +124,57 @@ func (s *SuiteTodo) TestCreateTodo() {
 	result, err = s.repository.Create(s.ctx, data)
 	require.NoError(t, err)
 	assert.NotNil(t, result)
+}
+
+func (s *SuiteTodo) helperTestDeleteByUUID(stage int, data *model.Todo, mock sqlmock.Sqlmock, expectedErr error) {
+	for i := 1; i <= stage; i++ {
+		switch i {
+		case 1:
+			var dataUUID any
+			if (data.UUID == uuid.UUID{}) {
+				dataUUID = sqlmock.AnyArg()
+			} else {
+				dataUUID = data.UUID
+			}
+			expectQuery := s.mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "todos" WHERE uuid = $1`)).
+				WithArgs(
+					dataUUID,
+				)
+			if i == stage && expectedErr != nil {
+				expectQuery.WillReturnError(expectedErr)
+			} else {
+				expectQuery.WillReturnResult(sqlmock.NewResult(0, 1))
+			}
+		default:
+			panic(fmt.Sprintf("scenario %d/%d is not supported", i, stage))
+		}
+	}
+}
+
+func (s *SuiteTodo) TestDeleteByUUID() {
+	t := s.Suite.T()
+	var (
+		err           error
+		gormModel     gorm.Model  = builder.NewModel().Build()
+		data          *model.Todo = builder.NewTodo().WithModel(gormModel).WithID(uuid.New()).Build()
+		expectedError error
+	)
+
+	// Check nil
+	expectedError = fmt.Errorf("'ctx' is nil")
+	s.helperTestDeleteByUUID(0, data, s.mock, expectedError)
+	err = s.repository.DeleteByUUID(nil, uuid.UUID{})
+	require.EqualError(t, err, expectedError.Error())
+
+	// Check empty uuid
+	expectedError = fmt.Errorf("'todo_uuid' is empty")
+	s.helperTestDeleteByUUID(0, data, s.mock, expectedError)
+	err = s.repository.DeleteByUUID(s.ctx, uuid.UUID{})
+	require.EqualError(t, err, expectedError.Error())
+
+	// Check
+	expectedError = nil
+	s.helperTestDeleteByUUID(1, data, s.mock, expectedError)
+	err = s.repository.DeleteByUUID(s.ctx, data.UUID)
+	assert.NoError(t, err)
 }

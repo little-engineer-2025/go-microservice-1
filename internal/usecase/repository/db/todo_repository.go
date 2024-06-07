@@ -9,6 +9,7 @@ import (
 	app_context "github.com/avisiedo/go-microservice-1/internal/infrastructure/context"
 	repository "github.com/avisiedo/go-microservice-1/internal/interface/repository/db"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type todoRepository struct{}
@@ -18,7 +19,13 @@ func NewTodo(cfg *config.Config) repository.TodoRepository {
 }
 
 func (r *todoRepository) Create(ctx context.Context, todo *model.Todo) (*model.Todo, error) {
-	db := app_context.DBFromContext(ctx)
+	var (
+		db  *gorm.DB
+		err error
+	)
+	if db, err = app_context.DBFromContext(ctx); err != nil {
+		return nil, err
+	}
 	if todo == nil {
 		return nil, errors.New("'todo' is nil")
 	}
@@ -32,7 +39,13 @@ func (r *todoRepository) Create(ctx context.Context, todo *model.Todo) (*model.T
 }
 
 func (r *todoRepository) Update(ctx context.Context, todo *model.Todo) (*model.Todo, error) {
-	db := app_context.DBFromContext(ctx)
+	var (
+		db  *gorm.DB
+		err error
+	)
+	if db, err = app_context.DBFromContext(ctx); err != nil {
+		return nil, err
+	}
 	if err := db.Updates(todo).Error; err != nil {
 		return nil, err
 	}
@@ -40,13 +53,16 @@ func (r *todoRepository) Update(ctx context.Context, todo *model.Todo) (*model.T
 }
 
 func (r *todoRepository) GetByUUID(ctx context.Context, id uuid.UUID) (*model.Todo, error) {
-	if ctx == nil {
-		return nil, errors.New("'ctx' is nil")
+	var (
+		db  *gorm.DB
+		err error
+	)
+	if db, err = app_context.DBFromContext(ctx); err != nil {
+		return nil, err
 	}
 	if (id == uuid.UUID{}) {
-		return nil, errors.New("'ctx' is nil")
+		return nil, errors.New("'id' is empty")
 	}
-	db := app_context.DBFromContext(ctx)
 	result := &model.Todo{}
 	if err := db.First(result, "uuid = ?", id).Error; err != nil {
 		return nil, err
@@ -56,8 +72,14 @@ func (r *todoRepository) GetByUUID(ctx context.Context, id uuid.UUID) (*model.To
 
 func (r *todoRepository) GetAll(ctx context.Context) ([]model.Todo, error) {
 	// TODO refactor to support paginated results
-	var count int64
-	db := app_context.DBFromContext(ctx)
+	var (
+		db    *gorm.DB
+		err   error
+		count int64
+	)
+	if db, err = app_context.DBFromContext(ctx); err != nil {
+		return nil, err
+	}
 	if err := db.Model(&model.Todo{}).Count(&count).Error; err != nil {
 		return []model.Todo{}, err
 	}
@@ -69,7 +91,16 @@ func (r *todoRepository) GetAll(ctx context.Context) ([]model.Todo, error) {
 	return []model.Todo{}, nil
 }
 
-func (r *todoRepository) DeleteByUUID(ctx context.Context, uuid uuid.UUID) error {
-	db := app_context.DBFromContext(ctx)
-	return db.Unscoped().Delete(&model.Todo{}, "uuid = ?", uuid).Error
+func (r *todoRepository) DeleteByUUID(ctx context.Context, todo_uuid uuid.UUID) error {
+	var (
+		db  *gorm.DB
+		err error
+	)
+	if db, err = app_context.DBFromContext(ctx); err != nil {
+		return err
+	}
+	if (todo_uuid == uuid.UUID{}) {
+		return errors.New("'todo_uuid' is empty")
+	}
+	return db.Unscoped().Delete(&model.Todo{}, "uuid = ?", todo_uuid).Error
 }

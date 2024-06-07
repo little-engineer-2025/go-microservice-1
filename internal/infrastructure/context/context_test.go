@@ -35,11 +35,13 @@ func TestDBFromContext(t *testing.T) {
 		err error
 	)
 
-	db = DBFromContext(nil)
+	db, err = DBFromContext(nil)
+	require.EqualError(t, err, "'ctx' is nil")
 	require.Nil(t, db)
 
 	ctx := context.Background()
-	db = DBFromContext(ctx)
+	db, err = DBFromContext(ctx)
+	require.EqualError(t, err, "database not found in context")
 	require.Nil(t, db)
 
 	_, db, err = test.NewSqlMock(nil)
@@ -47,6 +49,7 @@ func TestDBFromContext(t *testing.T) {
 	require.NotNil(t, db)
 	ctx = WithDB(ctx, db)
 	require.NotNil(t, ctx)
-	db = DBFromContext(ctx)
+	db, err = DBFromContext(ctx)
+	require.NoError(t, err)
 	require.NotNil(t, db)
 }
