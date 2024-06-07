@@ -16,7 +16,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/confluentinc/confluent-kafka-go v1.9.2
 	github.com/getkin/kin-openapi v0.124.0
-	github.com/go-playground/validator/v10 v10.20.0
+	github.com/go-playground/validator/v10 v10.21.0
 	github.com/golang-migrate/migrate/v4 v4.17.1
 	github.com/google/uuid v1.6.0
 	github.com/labstack/echo/v4 v4.12.0
@@ -27,7 +27,6 @@ require (
 	github.com/prometheus/client_golang v1.19.1
 	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.9.0
-	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f
 	gorm.io/driver/postgres v1.5.7
 	gorm.io/gorm v1.25.10
 	k8s.io/utils v0.0.0-20240310230437-4693a0247e57
@@ -84,6 +83,7 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.22.0 // indirect
+	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f // indirect
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
