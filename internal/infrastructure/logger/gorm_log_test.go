@@ -33,7 +33,11 @@ const (
 )
 
 // https://regex101.com/
-const regularExp = `^time=[[:digit:]]{4}\-[[:digit:]]{2}\-[[:digit:]]{2}T[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2}.[[:digit:]]+(|\+[[:digit:]]{2}:[[:digit:]]{2}) level=(.*) msg=(.*)\n$`
+const (
+	timeExp    = `time=[[:digit:]]{4}\-[[:digit:]]{2}\-[[:digit:]]{2}T[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2}.[[:digit:]]+(|Z|\+[[:digit:]]{2}:[[:digit:]]{2})`
+	levelExp   = `level=(DEBUG-4|DEBUG|WARNING|NOTICE|INFO|WARN|ERROR|FATAL)`
+	regularExp = "^" + timeExp + " " + levelExp + " " + `msg=(.*)\n$`
+)
 
 func helperCommonTestCase(levelMsg slog.Level) []TestCase {
 	return []TestCase{
@@ -161,7 +165,7 @@ func TestError(t *testing.T) {
 
 func TestTraceNoError(t *testing.T) {
 	// https://regex101.com/
-	const regularExpTraceNoError = `^time=[[:digit:]]{4}\-[[:digit:]]{2}\-[[:digit:]]{2}T[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2}.[[:digit:]]+(|\+[[:digit:]]{2}:[[:digit:]]{2}) level=(.*) msg=(.*)\n$`
+	const regularExpTraceNoError = "^" + timeExp + " " + levelExp + " " + `msg=(.*)\n$`
 	b := bytes.Buffer{}
 	sh := slog.NewTextHandler(&b, &slog.HandlerOptions{
 		Level: LevelTrace,
@@ -179,7 +183,7 @@ func TestTraceNoError(t *testing.T) {
 
 func TestTraceError(t *testing.T) {
 	// https://regex101.com/
-	const regularExpTraceError = `^time=[[:digit:]]{4}\-[[:digit:]]{2}\-[[:digit:]]{2}T[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2}.[[:digit:]]+(|\+[[:digit:]]{2}:[[:digit:]]{2}) level=(.*) msg=(.*) error=(.*) query=\"(.*)\" elapsed=(.*) rows=(.*)\n$`
+	const regularExpTraceError = "^" + timeExp + " " + levelExp + " " + `msg=(.*) error=(.*) query=\"(.*)\" elapsed=(.*) rows=(.*)\n$`
 	b := bytes.Buffer{}
 	sh := slog.NewTextHandler(&b, &slog.HandlerOptions{
 		Level: LevelTrace,

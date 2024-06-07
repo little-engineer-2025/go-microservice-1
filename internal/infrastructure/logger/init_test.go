@@ -51,7 +51,7 @@ func TestLogBuildInfo(t *testing.T) {
 	slog.SetDefault(slogDefault)
 
 	// https://regex101.com/
-	const regularExp = `^time=[[:digit:]]{4}\-[[:digit:]]{2}\-[[:digit:]]{2}T[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2}.[[:digit:]]+(|\+[[:digit:]]{2}:[[:digit:]]{2}) level=(.*) msg=(.*)\n$`
+	const regularExp = "^" + timeExp + " " + levelExp + " " + `msg=(.*)\n$`
 
 	assert.Regexp(t, regularExp, b.String())
 }

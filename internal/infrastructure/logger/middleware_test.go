@@ -29,7 +29,7 @@ func TestMiddlewareLogValues(t *testing.T) {
 	})
 	require.NoError(t, err)
 	// http://101regexp
-	regExp := `^time=[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}T[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2}\.[[:digit:]]+(|\+[[:digit:]]{2}:[[:digit:]]{2}) level=(.*) msg="(.*)" request-id="(.*)" method=(.*) uri="(.*)" status=(.*)\n$`
+	regExp := "^" + timeExp + " " + levelExp + " " + `msg="(.*)" request-id="(.*)" method=(.*) uri="(.*)" status=(.*)\n$`
 	require.Regexp(t, regExp, b.String())
 }
 
@@ -50,6 +50,6 @@ func TestMiddlewareLogValuesError(t *testing.T) {
 	})
 	require.NoError(t, err)
 	// http://101regexp
-	regExp := `^time=[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}T[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2}\.[[:digit:]]+(|\+[[:digit:]]{2}:[[:digit:]]{2}) level=(.*) msg="(.*)" request-id="(.*)" method=(.*) uri="(.*)" status=(.*) err="(.*)"\n$`
+	regExp := "^" + timeExp + " " + levelExp + " " + `msg="(.*)" request-id="(.*)" method=(.*) uri="(.*)" status=(.*) err="(.*)"\n$`
 	require.Regexp(t, regExp, b.String())
 }
