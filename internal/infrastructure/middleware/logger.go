@@ -17,21 +17,21 @@ type SLogMiddlewareConfig struct {
 
 // SLogMiddlewareWithConfig create a middleware for logging
 // config provides
-func SLogMiddlewareWithConfig(config *SLogMiddlewareConfig) echo.MiddlewareFunc {
-	if config == nil {
-		panic("'config' is nil")
+func SLogMiddlewareWithConfig(cfg *SLogMiddlewareConfig) echo.MiddlewareFunc {
+	if cfg == nil {
+		panic("'cfg' is nil")
 	}
-	if config.Log == nil {
-		config.Log = slog.Default()
+	if cfg.Log == nil {
+		cfg.Log = slog.Default()
 	}
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			if config.Skipper != nil && config.Skipper(c) {
+			if cfg.Skipper != nil && cfg.Skipper(c) {
 				return next(c)
 			}
 			req := c.Request()
 			ctx := c.Request().Context()
-			ctx = app_context.WithLog(ctx, config.Log)
+			ctx = app_context.WithLog(ctx, cfg.Log)
 			c.SetRequest(req.WithContext(ctx))
 
 			// Invoke next middleware
@@ -61,6 +61,7 @@ func SLogRequest(ctx context.Context, err error, method, path string, status int
 			slog.String("path", path),
 			slog.Int("status", status),
 		)
+		return
 	}
 	l.InfoContext(
 		ctx,

@@ -1,9 +1,13 @@
 package middleware
 
 import (
+	"bytes"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRequestResponseValidator(t *testing.T) {
@@ -109,4 +113,29 @@ func TestCheckUtf8MultiLine(t *testing.T) {
 
 func TestInitOpenAPIFormats(t *testing.T) {
 	InitOpenAPIFormats()
+}
+
+func TestWriteHeader(t *testing.T) {
+	res := &ResponseRecorder{
+		buffer:   &bytes.Buffer{},
+		status:   http.StatusOK,
+		original: httptest.NewRecorder(),
+	}
+	res.Header().Set("test", "test-value")
+	res.WriteHeader(http.StatusOK)
+	assert.Equal(t, "test-value", res.Header().Get("test"))
+	assert.Equal(t, "", res.buffer.String())
+}
+
+func TestWrite(t *testing.T) {
+	res := &ResponseRecorder{
+		buffer:   &bytes.Buffer{},
+		status:   http.StatusOK,
+		original: httptest.NewRecorder(),
+	}
+	n, err := res.Write([]byte(`{}`))
+	require.NoError(t, err)
+	assert.Equal(t, 2, n)
+	res.WriteHeader(http.StatusOK)
+	assert.Equal(t, "{}", res.buffer.String())
 }
