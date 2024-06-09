@@ -15,15 +15,17 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
-const dbMirationScriptPath = "./scripts/db/migrations"
-
 // From hmscontent
 func CreateMigrationFile(migrationName string) error {
+	var (
+		f   *os.File
+		err error
+	)
 	// datetime format in YYYYMMDDhhmmss - uses the reference time Mon Jan 2 15:04:05 MST 2006
 	datetime := time.Now().Format("20060102150405")
 
-	filenameUp := fmt.Sprintf(dbMirationScriptPath+"/%s_%s.up.sql", datetime, migrationName)
-	filenameDown := fmt.Sprintf(dbMirationScriptPath+"/%s_%s.down.sql", datetime, migrationName)
+	filenameUp := fmt.Sprintf(dbMigrationPath+"/%s_%s.up.sql", datetime, migrationName)
+	filenameDown := fmt.Sprintf(dbMigrationPath+"/%s_%s.down.sql", datetime, migrationName)
 
 	migrationTemplate := fmt.Sprintf(`
 -- File created by: %s new %s
@@ -32,24 +34,20 @@ BEGIN;
 COMMIT;
 `, os.Args[0], migrationName)
 
-	f, err := os.Create(filenameUp)
-	if err != nil {
+	if f, err = os.Create(filenameUp); err != nil {
 		return err
 	}
-	_, err = f.WriteString(migrationTemplate)
-	if err != nil {
+	if _, err = f.WriteString(migrationTemplate); err != nil {
 		return err
 	}
 	if err = f.Close(); err != nil {
 		return err
 	}
 
-	f, _ = os.Create(filenameDown)
-	if err != nil {
+	if f, err = os.Create(filenameDown); err != nil {
 		return err
 	}
-	_, err = f.WriteString(migrationTemplate)
-	if err != nil {
+	if _, err = f.WriteString(migrationTemplate); err != nil {
 		return err
 	}
 	if err = f.Close(); err != nil {
@@ -59,11 +57,11 @@ COMMIT;
 	return nil
 }
 
-func MigrateDb(config *config.Config, direction string, steps ...int) error {
-	if config == nil {
-		return fmt.Errorf("'config' cannot be nil")
+func MigrateDb(cfg *config.Config, direction string, steps ...int) error {
+	if cfg == nil {
+		return fmt.Errorf("'cfg' is nil")
 	}
-	_, m, err := NewDbMigration(config)
+	m, err := NewDbMigration(cfg)
 	if err != nil {
 		return err
 	}
@@ -114,9 +112,11 @@ func MigrateDb(config *config.Config, direction string, steps ...int) error {
 }
 
 func getPreviousMigrationVersion(m *migrate.Migrate) (int, error) {
-	var f *os.File
-	f, err := os.Open(dbMirationScriptPath)
-	if err != nil {
+	var (
+		f   *os.File
+		err error
+	)
+	if f, err = os.Open(dbMigrationPath); err != nil {
 		return 0, fmt.Errorf("failed to open file: %v", err)
 	}
 	defer f.Close()

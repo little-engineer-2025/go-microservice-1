@@ -9,13 +9,27 @@ import (
 	"github.com/avisiedo/go-microservice-1/internal/config"
 	"github.com/avisiedo/go-microservice-1/internal/infrastructure/logger"
 	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	pg "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-const DbMigrationPath = "./scripts/db/migrations"
+const defaultDBMigrationPath = "./scripts/db/migrations"
+
+var dbMigrationPath = defaultDBMigrationPath
+
+func DBMigrationPath() string {
+	if dbMigrationPath == "" {
+		return defaultDBMigrationPath
+	}
+	return dbMigrationPath
+}
+
+func SetDBMigrationPath(value string) {
+	dbMigrationPath = value
+}
 
 func getURL(config *config.Config) string {
 	var sslStr string
@@ -61,27 +75,28 @@ func NewDB(cfg *config.Config, sl *slog.Logger) (db *gorm.DB) {
 	return db
 }
 
-func NewDbMigration(config *config.Config) (db *gorm.DB, m *migrate.Migrate, err error) {
-	var sqlDb *sql.DB
+func NewDbMigration(config *config.Config) (m *migrate.Migrate, err error) {
+	var (
+		sqlDb  *sql.DB
+		driver database.Driver
+	)
 	dbURL := getURL(config)
-	sqlDb, err = sql.Open("postgres", dbURL)
-	if err != nil {
-		return nil, nil, fmt.Errorf("could not connect to database: %w", err)
+	if sqlDb, err = sql.Open("postgres", dbURL); err != nil {
+		return nil, fmt.Errorf("could not connect to database: %w", err)
 	}
 
-	driver, err := postgres.WithInstance(sqlDb, &postgres.Config{})
-	if err != nil {
-		return nil, nil, fmt.Errorf("could not get database driver: %w", err)
+	if driver, err = postgres.WithInstance(sqlDb, &postgres.Config{}); err != nil {
+		return nil, fmt.Errorf("could not get database driver: %w", err)
 	}
 
 	if m, err = migrate.NewWithDatabaseInstance(
-		fmt.Sprintf("file://%s", DbMigrationPath),
+		fmt.Sprintf("file://%s", dbMigrationPath),
 		"postgres",
 		driver); err != nil {
-		return nil, nil, fmt.Errorf("could not create migration instance: %w", err)
+		return nil, fmt.Errorf("could not create migration instance: %w", err)
 	}
 
-	return db, m, err
+	return m, err
 }
 
 func Close(db *gorm.DB) {
