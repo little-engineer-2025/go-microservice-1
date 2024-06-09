@@ -24,6 +24,15 @@ type todoPresenter struct {
 }
 
 func NewTodo(cfg *config.Config, i interactor.Todo, db *gorm.DB) presenter.Todo {
+	if cfg == nil {
+		panic("'cfg' is nil")
+	}
+	if i == nil {
+		panic("interactor is nil")
+	}
+	if db == nil {
+		panic("'db' is nil")
+	}
 	return &todoPresenter{
 		db:         db,
 		interactor: i,

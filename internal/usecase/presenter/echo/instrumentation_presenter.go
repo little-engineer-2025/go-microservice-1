@@ -12,6 +12,9 @@ type instrumentation struct {
 }
 
 func NewInstrumentation(metrics *infra_metrics.Metrics) presenter.Instrumentation {
+	if metrics == nil {
+		panic("'metrics' is nil")
+	}
 	return &instrumentation{
 		metrics: metrics,
 	}

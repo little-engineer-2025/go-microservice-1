@@ -11,6 +11,9 @@ type private struct {
 
 // NewPrivate
 func NewPrivate(i interactor.Private) presenter.Private {
+	if i == nil {
+		panic("interactor is nil")
+	}
 	return newPrivate(i)
 }
 

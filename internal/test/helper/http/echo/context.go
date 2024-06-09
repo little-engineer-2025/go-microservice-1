@@ -53,7 +53,7 @@ func NewContextWithContext(ctx context.Context, e *echo.Echo, method, path strin
 	}
 	req.Header = headers
 	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set(echo.HeaderContentType, "application/json")
 	}
 	res := httptest.NewRecorder()
 
