@@ -41,16 +41,6 @@ Go to <https://quay.io/> and login with your Red Hat user account.
     source .venv/bin/activate
     pip install -r requirements-dev.txt
 
-## Deploying to ephemeral
-
-    make ephemeral-login
-    make ephemeral-namespace-create
-    make ephemeral-deploy
-
-    # If correct image was already built and pushed,
-    # set EPHEMERAL_NO_BUILD=y to skip these steps.
-    make ephemeral-deploy EPHEMERAL_NO_BUILD=y
-
 ## Launching request against the API
 
 From VSCode or any IDE which support the .http files, we could open
