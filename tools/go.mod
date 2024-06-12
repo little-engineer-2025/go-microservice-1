@@ -12,7 +12,7 @@ toolchain go1.22.0
 require (
 	github.com/achiku/planter v0.0.0-20230118102009-4847a8211e35
 	github.com/atombender/go-jsonschema v0.12.1
-	github.com/deepmap/oapi-codegen v1.16.2
+	github.com/deepmap/oapi-codegen v1.16.3
 	github.com/golangci/golangci-lint v1.59.1
 	github.com/loov/goda v0.5.8
 	github.com/mikefarah/yq/v4 v4.44.1
