@@ -4,13 +4,15 @@
 package public
 
 import (
+	"time"
+
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 // ToDo defines model for ToDo.
 type ToDo struct {
 	Description string              `json:"description"`
-	DueDate     *openapi_types.Date `json:"due_date,omitempty"`
+	DueDate     *time.Time          `json:"due_date,omitempty"`
 	Title       string              `json:"title"`
 	TodoId      *openapi_types.UUID `json:"todo_id,omitempty"`
 }

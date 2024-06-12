@@ -80,12 +80,12 @@ func (r *todoRepository) GetAll(ctx context.Context) ([]model.Todo, error) {
 	if db, err = app_context.DBFromContext(ctx); err != nil {
 		return nil, err
 	}
-	if err := db.Model(&model.Todo{}).Count(&count).Error; err != nil {
+	if err = db.Model(&model.Todo{}).Count(&count).Error; err != nil {
 		return []model.Todo{}, err
 	}
 	if count > 0 {
 		result := make([]model.Todo, count)
-		err := db.Count(&count).Find(&model.Todo{}).Error
+		err = db.Find(&result).Error
 		return result, err
 	}
 	return []model.Todo{}, nil

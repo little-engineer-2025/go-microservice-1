@@ -15,11 +15,12 @@ type TodoInput struct{}
 func (i TodoInput) Create(ctx echo.Context) (*model.Todo, error) {
 	var apiInput public.ToDo
 	if err := ctx.Bind(&apiInput); err != nil {
-		return nil, fmt.Errorf("binding data: %w", err)
+		return nil, fmt.Errorf("binding request data: %w", err)
 	}
 	data := &model.Todo{
 		Title:       apiInput.Title,
 		Description: apiInput.Description,
+		DueDate:     apiInput.DueDate,
 	}
 	return data, nil
 }

@@ -1,6 +1,8 @@
 package http
 
 import (
+	"time"
+
 	"github.com/avisiedo/go-microservice-1/internal/api/http/public"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
@@ -11,7 +13,7 @@ type ToDo interface {
 	WithID(value *openapi_types.UUID) ToDo
 	WithTitle(value string) ToDo
 	WithDescription(value string) ToDo
-	WithDueDate(value *openapi_types.Date) ToDo
+	WithDueDate(value *time.Time) ToDo
 }
 
 type todo public.ToDo
@@ -30,7 +32,7 @@ func (b *todo) WithDescription(value string) ToDo {
 	return b
 }
 
-func (b *todo) WithDueDate(value *openapi_types.Date) ToDo {
+func (b *todo) WithDueDate(value *time.Time) ToDo {
 	b.DueDate = value
 	return b
 }

@@ -2,8 +2,8 @@
 openapi: 3.0.0
 info:
   title: ToDo API
+  version: '1.0'
   description: API for managing ToDo items
-  version: "1.0"
   license:
     name: Apache
   tags:
@@ -12,146 +12,135 @@ info:
 paths:
   /todos:
     get:
-      summary: Retrieve all ToDo items
-      tags:
-        - todo
-      operationId: getAllTodos
+      tags: [todo]
       responses:
         '200':
-          description: A list of ToDo items
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/ToDo'
+          description: A list of ToDo items
+      operationId: getAllTodos
+      summary: Retrieve all ToDo items
     post:
-      summary: Create a new ToDo item
-      tags:
-        - todo
-      operationId: createTodo
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ToDoInput'
+        required: true
+      tags: [todo]
       responses:
         '201':
-          description: The created ToDo item
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ToDo'
+          description: The created ToDo item
+      operationId: createTodo
+      summary: Create a new ToDo item
   /todos/{todoId}:
-    put:
-      summary: Substitute an existing ToDo item
-      tags:
-        - todo
-      operationId: updateTodo
+    get:
+      tags: [todo]
       parameters:
         - name: todoId
-          in: path
-          required: true
           description: ID of the item to Retrieve
           schema:
-            type: string
             format: uuid
+            type: string
+          in: path
+          required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToDo'
+          description: The ToDo item
+      operationId: getTodo
+      summary: Get item by ID
+    put:
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ToDoInput'
+        required: true
+      tags: [todo]
+      parameters:
+        - name: todoId
+          description: ID of the item to Retrieve
+          schema:
+            format: uuid
+            type: string
+          in: path
+          required: true
       responses:
         '200':
-          description: The created ToDo item
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ToDo'
-    patch:
-      summary: Patch an existing ToDo item
-      tags:
-        - todo
-      operationId: patchTodo
+          description: The created ToDo item
+      operationId: updateTodo
+      summary: Substitute an existing ToDo item
+    delete:
+      tags: [todo]
       parameters:
         - name: todoId
-          in: path
-          required: true
           description: ID of the item to Retrieve
           schema:
-            type: string
             format: uuid
+            type: string
+          in: path
+          required: true
+      operationId: deleteTodo
+      summary: Remove item by ID
+    patch:
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ToDoInputPatch'
+        required: true
+      tags: [todo]
+      parameters:
+        - name: todoId
+          description: ID of the item to Retrieve
+          schema:
+            format: uuid
+            type: string
+          in: path
+          required: true
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToDo'
           description: The created ToDo item
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ToDo'
-    delete:
-      summary: Remove item by ID
-      tags:
-        - todo
-      operationId: deleteTodo
-      parameters:
-        - name: todoId
-          in: path
-          required: true
-          description: ID of the item to Retrieve
-          schema:
-            type: string
-            format: uuid
-    get:
-      summary: Get item by ID
-      tags:
-        - todo
-      operationId: getTodo
-      parameters:
-        - name: todoId
-          in: path
-          required: true
-          description: ID of the item to Retrieve
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: The ToDo item
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ToDo'
-
+      operationId: patchTodo
+      summary: Patch an existing ToDo item
 components:
   schemas:
     ToDo:
+      required: [title, description]
       type: object
       properties:
         todo_id:
-          type: string
           format: uuid
-          optional: false
+          type: string
         title:
           type: string
-          optional: false
         description:
           type: string
-          optional: false
         due_date:
+          format: date-time
           type: string
-          format: date
-      required:
-        - title
-        - description
     ToDoInput:
+      required: [title]
       type: object
       properties:
         title:
@@ -159,10 +148,8 @@ components:
         description:
           type: string
         due_date:
-          type: string
           format: date
-      required:
-        - title
+          type: string
     ToDoInputPatch:
       type: object
       properties:
@@ -173,6 +160,6 @@ components:
           type: string
           optional: true
         due_date:
-          type: string
           format: date
+          type: string
           optional: true

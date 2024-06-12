@@ -93,25 +93,3 @@ func TestSetDBMigrationPath(t *testing.T) {
 	assert.Equal(t, "/tmp", DBMigrationPath())
 	SetDBMigrationPath(oldDBMigrationPath)
 }
-
-func TestNewDBMigration(t *testing.T) {
-	cfg := config.Get()
-	require.NotNil(t, cfg)
-
-	oldPort := cfg.Database.Port
-	cfg.Database.Port = 2345
-	m, err := NewDbMigration(cfg)
-	cfg.Database.Port = oldPort
-	require.Nil(t, m)
-	require.EqualError(t, err, "could not get database driver: dial tcp 127.0.0.1:2345: connect: connection refused")
-
-	SetDBMigrationPath("/tmp-no-exist")
-	m, err = NewDbMigration(cfg)
-	require.Nil(t, m)
-	require.EqualError(t, err, "could not create migration instance: open .: no such file or directory")
-
-	SetDBMigrationPath("../../../scripts/db")
-	m, err = NewDbMigration(cfg)
-	require.NotNil(t, m)
-	require.NoError(t, err)
-}

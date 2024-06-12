@@ -7,7 +7,6 @@ import (
 	"github.com/avisiedo/go-microservice-1/internal/domain/model"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/oapi-codegen/runtime/types"
 )
 
 type TodoOutput struct{}
@@ -32,11 +31,7 @@ func (o TodoOutput) Create(ctx echo.Context, data *model.Todo) (*public.ToDo, er
 	output.TodoId = uuidTemp
 	output.Title = data.Title
 	output.Description = data.Description
-	if data.DueDate == nil {
-		output.DueDate = nil
-	} else {
-		output.DueDate.Time = *data.DueDate
-	}
+	output.DueDate = data.DueDate
 	return output, nil
 }
 
@@ -59,7 +54,7 @@ func (o TodoOutput) GetAll(ctx echo.Context, data []model.Todo) ([]public.ToDo, 
 		output[i].TodoId = &data[i].UUID
 		output[i].Title = data[i].Title
 		output[i].Description = data[i].Description
-		output[i].DueDate = &types.Date{Time: *data[i].DueDate}
+		output[i].DueDate = data[i].DueDate
 	}
 	return output, nil
 }
@@ -87,10 +82,6 @@ func (o TodoOutput) Get(ctx echo.Context, data *model.Todo) (*public.ToDo, error
 	out.TodoId = outUUID
 	out.Title = data.Title
 	out.Description = data.Description
-	if data.DueDate != nil {
-		dueDate := &types.Date{}
-		dueDate.Time = *data.DueDate
-		out.DueDate = dueDate
-	}
+	out.DueDate = data.DueDate
 	return out, nil
 }
