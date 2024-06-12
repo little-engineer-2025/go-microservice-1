@@ -4,19 +4,19 @@
 @port = 8000
 @host = {{hostname}}:{{port}}
 @contentType = application/json
-@basepath = /api/todos/v1
+@basepath = /api/todo/v1
 
 ### Get api specification
 
 # @name GetOpenapiSpecification
 
 # Request for localhost
-#   ./test/scripts/local-get-openapi.sh
+#   ./test/scripts/local-openapi.sh
 #
 # Request for ephemeral:
-#   ./test/scripts/ephe-get-openapi.sh
+#   ./test/scripts/ephe-openapi.sh
 GET {{schema}}://{{host}}{{basepath}}/openapi.json
-Request-Id: get_openapi
+Request-Id: openapi_get
 Content-Type: {{contentType}}
 
 ### Create todo
@@ -30,7 +30,7 @@ Content-Type: {{contentType}}
 #   ./test/scripts/ephe-todos-create.sh
 
 POST {{schema}}://{{host}}{{basepath}}/todos
-Request-Id: post_todos
+Request-Id: todos_post
 Content-Type: {{contentType}}
 
 <@ ../../test/data/http/todos-create.json
@@ -46,7 +46,7 @@ Content-Type: {{contentType}}
 #   ./test/scripts/ephe-todos-list.sh
 
 GET http://{{host}}{{basepath}}/todos?offset=0&limit=10
-Request-Id: get_todos
+Request-Id: todos_list
 Content-Type: {{contentType}}
 
 ### Get last created Todo
@@ -61,8 +61,8 @@ Content-Type: {{contentType}}
 #   UUID=""
 #   ./test/scripts/ephe-todos-read.sh $UUID
 
-GET  http://{{host}}{{basepath}}/todos/{{createTodo.response.body.uuid}}
-Request-Id: get_todos_uuid
+GET  http://{{host}}{{basepath}}/todos/{{createTodo.response.body.todo_id}}
+Request-Id: todos_read
 Content-Type: {{contentType}}
 
 ### Update rhel-idm domain information
@@ -77,8 +77,8 @@ Content-Type: {{contentType}}
 #   UUID=""
 #   ./test/scripts/ephe-todos-update.sh "$UUID"
 
-PUT http://{{host}}{{basepath}}/todos/{{createTodo.response.body.uuid}}
-Request-Id: put_todos_register
+PUT http://{{host}}{{basepath}}/todos/{{createTodo.response.body.todo_id}}
+Request-Id: todos_put
 Content-Type: {{contentType}}
 
 <@ ../../test/data/http/todo-update.json
@@ -95,8 +95,8 @@ Content-Type: {{contentType}}
 #   UUID=""
 #   ./test/scripts/ephe-todos-patch.sh "$UUID"
 
-PATCH http://{{host}}{{basepath}}/todos/{{createTodo.response.body.uuid}}
-Request-Id: patch_todos_register
+PATCH http://{{host}}{{basepath}}/todos/{{createTodo.response.body.todo_id}}
+Request-Id: todos_patch
 Content-Type: {{contentType}}
 
 <@ ../../test/data/http/todo-patch.json
@@ -111,6 +111,6 @@ Content-Type: {{contentType}}
 #   UUID=""
 #   ./test/scripts/ephe-todos-delete.sh "$UUID"
 
-DELETE http://{{host}}{{basepath}}/todos/{{createTodo.response.body.uuid}}
-Request-Id: delete_todos
+DELETE http://{{host}}{{basepath}}/todos/{{createTodo.response.body.todo_id}}
+Request-Id: todos_delete
 Content-Type: {{contentType}}
