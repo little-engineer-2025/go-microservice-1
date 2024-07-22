@@ -6,6 +6,8 @@
 /coverage.out
 /coverage.tmp.out
 
+/configs/config.yaml
+
 
 # Secrets
 /secrets
