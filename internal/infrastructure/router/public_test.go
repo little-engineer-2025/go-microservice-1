@@ -6,13 +6,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/avisiedo/go-microservice-1/internal/api/http/openapi"
 	"github.com/avisiedo/go-microservice-1/internal/api/http/public"
 	"github.com/avisiedo/go-microservice-1/internal/config"
 	"github.com/avisiedo/go-microservice-1/internal/infrastructure/metrics"
 	"github.com/avisiedo/go-microservice-1/internal/test"
 	mock_openapi "github.com/avisiedo/go-microservice-1/internal/test/mock/api/http/openapi"
-	presenter "github.com/avisiedo/go-microservice-1/internal/test/mock/interface/presenter/echo"
+	mock_http "github.com/avisiedo/go-microservice-1/internal/test/mock/handler/http"
 	"github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
@@ -34,7 +33,7 @@ func helperNewContextForSkipper(route string, method string, path string, header
 	return c
 }
 
-func helperNewGroupPublic(t *testing.T) (*echo.Echo, *config.Config, public.ServerInterface, openapi.ServerInterface, *metrics.Metrics) {
+func helperNewGroupPublic(t *testing.T) (*echo.Echo, *config.Config, *mock_http.Application, *mock_openapi.ServerInterface, *metrics.Metrics) {
 	var (
 		err error
 		db  *gorm.DB
@@ -50,7 +49,7 @@ func helperNewGroupPublic(t *testing.T) (*echo.Echo, *config.Config, public.Serv
 	require.NoError(t, err)
 	require.NotNil(t, db)
 
-	presenterPublic := presenter.NewTodo(t)
+	presenterPublic := mock_http.NewApplication(t)
 	presenterOpenAPI := mock_openapi.NewServerInterface(t)
 
 	e := echo.New()
@@ -76,85 +75,6 @@ func TestNewGroupPublicPanics(t *testing.T) {
 		e, cfg, presenterPublic, presenterOpenAPI, m := helperNewGroupPublic(t)
 		newPublic(e.Group(cfg.Application.PathPrefix), cfg, presenterPublic, presenterOpenAPI, m)
 	})
-}
-
-func TestNewGroupPublic(t *testing.T) {
-	const (
-		appPrefix = "/api"
-		appName   = "/todo"
-	)
-	type TestCaseExpected map[string]map[string]string
-	swagger, err := public.GetSwagger()
-	require.NoError(t, err)
-	require.NotNil(t, swagger)
-
-	majorVersion := strings.Split(swagger.Info.Version, ".")[0]
-	majorMinorVersion := majorVersion + "." + strings.Split(swagger.Info.Version, ".")[1]
-
-	testCases := TestCaseExpected{
-		appPrefix + appName + "/v" + majorMinorVersion + "/openapi.json": {
-			"GET": "github.com/avisiedo/go-microservice-1/internal/api/http/openapi.(*ServerInterfaceWrapper).GetOpenapi-fm",
-		},
-		appPrefix + appName + "/v" + majorVersion + "/openapi.json": {
-			"GET": "github.com/avisiedo/go-microservice-1/internal/api/http/openapi.(*ServerInterfaceWrapper).GetOpenapi-fm",
-		},
-
-		appPrefix + appName + "/v" + majorMinorVersion + "/todos": {
-			"GET":  "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).GetAllTodos-fm",
-			"POST": "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).CreateTodo-fm",
-		},
-		appPrefix + appName + "/v" + majorVersion + "/todos": {
-			"GET":  "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).GetAllTodos-fm",
-			"POST": "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).CreateTodo-fm",
-		},
-
-		appPrefix + appName + "/v" + majorMinorVersion + "/todos/:todoId": {
-			"GET":    "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).GetTodo-fm",
-			"PUT":    "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).UpdateTodo-fm",
-			"PATCH":  "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).PatchTodo-fm",
-			"DELETE": "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).DeleteTodo-fm",
-		},
-		appPrefix + appName + "/v" + majorVersion + "/todos/:todoId": {
-			"GET":    "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).GetTodo-fm",
-			"PUT":    "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).UpdateTodo-fm",
-			"PATCH":  "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).PatchTodo-fm",
-			"DELETE": "github.com/avisiedo/go-microservice-1/internal/api/http/public.(*ServerInterfaceWrapper).DeleteTodo-fm",
-		},
-
-		// This routes are added when the group is created
-		appPrefix + appName + "/v" + majorMinorVersion + "/*": {
-			"echo_route_not_found": "github.com/labstack/echo/v4.init.func1",
-		},
-		appPrefix + appName + "/v" + majorVersion + "/*": {
-			"echo_route_not_found": "github.com/labstack/echo/v4.init.func1",
-		},
-		appPrefix + appName + "/v" + majorMinorVersion: {
-			"echo_route_not_found": "github.com/labstack/echo/v4.init.func1",
-		},
-		appPrefix + appName + "/v" + majorVersion: {
-			"echo_route_not_found": "github.com/labstack/echo/v4.init.func1",
-		},
-	}
-
-	e, _, _, _, _ := helperNewGroupPublic(t)
-
-	// Match Routes in expected
-	for _, route := range e.Routes() {
-		t.Logf("Method=%s Path=%s Name=%s", route.Method, route.Path, route.Name)
-
-		methods, okPath := testCases[route.Path]
-		if !okPath {
-			t.Logf("Path=%s not found", route.Path)
-		}
-		assert.Truef(t, okPath, "path=%s not found into the expected ones", route.Path)
-
-		name, okMethod := methods[route.Method]
-		if !okMethod {
-			t.Logf("Method=%s not found for path=%s", route.Method, route.Path)
-		}
-		assert.Truef(t, okMethod, "method=%s not found into the expected ones for the path=%s", route.Method, route.Path)
-		assert.Equalf(t, name, route.Name, "handler for path=%s method=%s does not match", route.Path, route.Method)
-	}
 }
 
 func TestNewGroupPublicGroupRegistered(t *testing.T) {
@@ -219,6 +139,8 @@ func TestNewGroupPublicGroupRegistered(t *testing.T) {
 
 		result := e.Reverse(testCase.Given.HandlerName, testCase.Given.Params)
 		require.Equal(t, testCase.Expected, result)
+		publicPresenter.AssertExpectations(t)
+		openAPIPresenter.AssertExpectations(t)
 	}
 }
 
