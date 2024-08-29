@@ -26,7 +26,7 @@ install-tools: install-go-tools install-python-tools ## Install tools used to bu
 .PHONY: build-all
 build-all: ## Generate code and build binaries
 	$(MAKE) generate-api
-	$(MAKE) generate-event
+	# $(MAKE) generate-event
 	$(MAKE) generate-mock
 	$(MAKE) generate-diagrams
 	$(MAKE) build
@@ -183,7 +183,7 @@ MOCK_DIRS := internal/api/http/private \
 	internal/interface/repository/event \
 	internal/interface/repository/client \
 	internal/interface/repository/db \
-	internal/handler \
+	internal/handler/http \
 	internal/infrastructure/event \
 	internal/infrastructure/service \
 	internal/infrastructure/middleware \
