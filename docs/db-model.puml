@@ -1,0 +1,22 @@
+@startuml
+hide circle
+skinparam linetype ortho
+
+entity "**schema_migrations**" {
+  + ""version"": //bigint [PK]//
+  --
+  *""dirty"": //boolean //
+}
+
+entity "**todos**" {
+  + ""id"": //serial [PK]//
+  --
+  ""created_at"": //timestamp without time zone //
+  ""updated_at"": //timestamp without time zone //
+  ""deleted_at"": //timestamp without time zone //
+  *""uuid"": //uuid //
+  *""title"": //character varying(255) //
+  *""description"": //text //
+  ""due_date"": //timestamp without time zone //
+}
+@enduml
