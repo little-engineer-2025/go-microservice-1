@@ -19,7 +19,7 @@ resources for the API.
 
 ```sh
 # Install required packages
-$ sudo dnf install git golang make podman podman-compose
+$ sudo dnf install git golang make podman podman-compose delve
 
 # Create and edit the file confis/config.yaml
 $ cp -vf configs/config.example.yaml configs/config.yaml
