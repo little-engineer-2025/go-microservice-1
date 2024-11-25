@@ -4,7 +4,7 @@
 # the generated binaries.
 ##
 
-GOVERSION := 1.21
+GOVERSION := 1.22
 export GOVERSION
 
 ifeq (,$(shell ls -1d vendor 2>/dev/null))

@@ -4,7 +4,7 @@
 
 
 # https://catalog.redhat.com/software/containers/ubi9/go-toolset/61e5c00b4ec9945c18787690
-FROM registry.access.redhat.com/ubi9/go-toolset:1.21.9-1.1715774364@sha256:f001ad1001a22fe5f6fc7d876fc172b01c1b7dcd6c498f83a07b425e24275a79 as builder
+FROM registry.access.redhat.com/ubi9/go-toolset:1.22.5-1731639025@sha256:c7bfd2501cb1be171366434a368db669b32f08a0198c1473b9bff0a379613fc3 as builder
 LABEL todo-backend=builder
 # https://developers.redhat.com/articles/2022/05/31/your-go-application-fips-compliant
 ENV OPENSSL_FORCE_FIPS_MODE=1
