@@ -11,7 +11,6 @@ ENV OPENSSL_FORCE_FIPS_MODE=1
 WORKDIR /go/src/app
 COPY . .
 USER 0
-RUN git log -1
 RUN make get-deps build
 
 
@@ -22,10 +21,8 @@ LABEL todo-backend=backend
 ENV OPENSSL_FORCE_FIPS_MODE=1
 RUN mkdir -p /opt/bin /opt/bin/scripts/db /opt/bin/configs
 WORKDIR /opt/bin
-RUN microdnf update -y && microdnf clean all
 COPY --from=builder /go/src/app/bin/* ./
 COPY scripts/db/migrations /opt/bin/scripts/db/migrations
-COPY configs/config.example.yaml /opt/bin/configs/config.yaml
 USER 1001
 # TODO Accomodate to the service arguments
 CMD ["/opt/bin/service"]
