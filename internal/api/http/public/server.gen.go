@@ -14,6 +14,21 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// List All events
+	// (GET /events)
+	ListEvents(ctx echo.Context) error
+	// Create a Events
+	// (POST /events)
+	CreateEvent(ctx echo.Context) error
+	// Delete a Events
+	// (DELETE /events/{eventsId})
+	DeleteEvent(ctx echo.Context, eventsId string) error
+	// Get a Events
+	// (GET /events/{eventsId})
+	GetEvent(ctx echo.Context, eventsId string) error
+	// Update a Events
+	// (PUT /events/{eventsId})
+	UpdateEvent(ctx echo.Context, eventsId string) error
 	// Retrieve all ToDo items
 	// (GET /todos)
 	GetAllTodos(ctx echo.Context) error
@@ -37,6 +52,72 @@ type ServerInterface interface {
 // ServerInterfaceWrapper converts echo contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler ServerInterface
+}
+
+// ListEvents converts echo context to params.
+func (w *ServerInterfaceWrapper) ListEvents(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.ListEvents(ctx)
+	return err
+}
+
+// CreateEvent converts echo context to params.
+func (w *ServerInterfaceWrapper) CreateEvent(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.CreateEvent(ctx)
+	return err
+}
+
+// DeleteEvent converts echo context to params.
+func (w *ServerInterfaceWrapper) DeleteEvent(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "eventsId" -------------
+	var eventsId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "eventsId", runtime.ParamLocationPath, ctx.Param("eventsId"), &eventsId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter eventsId: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.DeleteEvent(ctx, eventsId)
+	return err
+}
+
+// GetEvent converts echo context to params.
+func (w *ServerInterfaceWrapper) GetEvent(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "eventsId" -------------
+	var eventsId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "eventsId", runtime.ParamLocationPath, ctx.Param("eventsId"), &eventsId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter eventsId: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetEvent(ctx, eventsId)
+	return err
+}
+
+// UpdateEvent converts echo context to params.
+func (w *ServerInterfaceWrapper) UpdateEvent(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "eventsId" -------------
+	var eventsId string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "eventsId", runtime.ParamLocationPath, ctx.Param("eventsId"), &eventsId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter eventsId: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.UpdateEvent(ctx, eventsId)
+	return err
 }
 
 // GetAllTodos converts echo context to params.
@@ -149,6 +230,11 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
+	router.GET(baseURL+"/events", wrapper.ListEvents)
+	router.POST(baseURL+"/events", wrapper.CreateEvent)
+	router.DELETE(baseURL+"/events/:eventsId", wrapper.DeleteEvent)
+	router.GET(baseURL+"/events/:eventsId", wrapper.GetEvent)
+	router.PUT(baseURL+"/events/:eventsId", wrapper.UpdateEvent)
 	router.GET(baseURL+"/todos", wrapper.GetAllTodos)
 	router.POST(baseURL+"/todos", wrapper.CreateTodo)
 	router.DELETE(baseURL+"/todos/:todoId", wrapper.DeleteTodo)

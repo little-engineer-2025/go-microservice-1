@@ -9,6 +9,16 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Events Represent an event
+type Events struct {
+	AllDay   *bool               `json:"all_day,omitempty"`
+	End      *time.Time          `json:"end,omitempty"`
+	EventId  *openapi_types.UUID `json:"event_id,omitempty"`
+	Location *string             `json:"location,omitempty"`
+	Start    *time.Time          `json:"start,omitempty"`
+	Title    *string             `json:"title,omitempty"`
+}
+
 // ToDo defines model for ToDo.
 type ToDo struct {
 	Description string              `json:"description"`
@@ -30,6 +40,12 @@ type ToDoInputPatch struct {
 	DueDate     *openapi_types.Date `json:"due_date,omitempty"`
 	Title       *string             `json:"title,omitempty"`
 }
+
+// CreateEventJSONRequestBody defines body for CreateEvent for application/json ContentType.
+type CreateEventJSONRequestBody = Events
+
+// UpdateEventJSONRequestBody defines body for UpdateEvent for application/json ContentType.
+type UpdateEventJSONRequestBody = Events
 
 // CreateTodoJSONRequestBody defines body for CreateTodo for application/json ContentType.
 type CreateTodoJSONRequestBody = ToDoInput
