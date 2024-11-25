@@ -15,6 +15,24 @@ type Application struct {
 	mock.Mock
 }
 
+// CreateEvent provides a mock function with given fields: ctx
+func (_m *Application) CreateEvent(ctx echo.Context) error {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateEvent")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(echo.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // CreateTodo provides a mock function with given fields: ctx
 func (_m *Application) CreateTodo(ctx echo.Context) error {
 	ret := _m.Called(ctx)
@@ -26,6 +44,24 @@ func (_m *Application) CreateTodo(ctx echo.Context) error {
 	var r0 error
 	if rf, ok := ret.Get(0).(func(echo.Context) error); ok {
 		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// DeleteEvent provides a mock function with given fields: ctx, eventsId
+func (_m *Application) DeleteEvent(ctx echo.Context, eventsId string) error {
+	ret := _m.Called(ctx, eventsId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteEvent")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(echo.Context, string) error); ok {
+		r0 = rf(ctx, eventsId)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -62,6 +98,24 @@ func (_m *Application) GetAllTodos(ctx echo.Context) error {
 	var r0 error
 	if rf, ok := ret.Get(0).(func(echo.Context) error); ok {
 		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// GetEvent provides a mock function with given fields: ctx, eventsId
+func (_m *Application) GetEvent(ctx echo.Context, eventsId string) error {
+	ret := _m.Called(ctx, eventsId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetEvent")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(echo.Context, string) error); ok {
+		r0 = rf(ctx, eventsId)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -159,6 +213,24 @@ func (_m *Application) GetTodo(ctx echo.Context, todoId uuid.UUID) error {
 	return r0
 }
 
+// ListEvents provides a mock function with given fields: ctx
+func (_m *Application) ListEvents(ctx echo.Context) error {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListEvents")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(echo.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // PatchTodo provides a mock function with given fields: ctx, todoId
 func (_m *Application) PatchTodo(ctx echo.Context, todoId uuid.UUID) error {
 	ret := _m.Called(ctx, todoId)
@@ -170,6 +242,24 @@ func (_m *Application) PatchTodo(ctx echo.Context, todoId uuid.UUID) error {
 	var r0 error
 	if rf, ok := ret.Get(0).(func(echo.Context, uuid.UUID) error); ok {
 		r0 = rf(ctx, todoId)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// UpdateEvent provides a mock function with given fields: ctx, eventsId
+func (_m *Application) UpdateEvent(ctx echo.Context, eventsId string) error {
+	ret := _m.Called(ctx, eventsId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateEvent")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(echo.Context, string) error); ok {
+		r0 = rf(ctx, eventsId)
 	} else {
 		r0 = ret.Error(0)
 	}
