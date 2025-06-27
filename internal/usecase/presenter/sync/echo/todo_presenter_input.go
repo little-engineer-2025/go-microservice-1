@@ -32,6 +32,16 @@ func (i *todoInput) Create(ctx echo.Context) (*model.Todo, error) {
 		Description: apiInput.Description,
 		DueDate:     apiInput.DueDate,
 	}
+	if data == nil {
+		return nil, fmt.Errorf("empty todo data")
+	}
+	if data.Title == "" {
+		return nil, fmt.Errorf("title is an empty string")
+	}
+	if data.Description == "" {
+		return nil, fmt.Errorf("description is an empty string")
+	}
+
 	return data, nil
 }
 

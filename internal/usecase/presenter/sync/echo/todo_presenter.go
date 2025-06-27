@@ -21,19 +21,25 @@ type todoPresenter struct {
 	output     presenter.TodoOutput
 }
 
+const (
+	ErrPanicCfgIsNil        = "'cfg' is nil"
+	ErrPanicInteractorIsNil = "'interactor' is nil"
+	ErrPanicDbIsNil         = "'db' is nil"
+)
+
 func NewTodo(cfg *config.Config, i interactor.Todo, db *gorm.DB) presenter.Todo {
 	return newTodo(cfg, NewTodoInput(), NewTodoOutput(), i, db)
 }
 
 func newTodo(cfg *config.Config, input presenter.TodoInput, output presenter.TodoOutput, i interactor.Todo, db *gorm.DB) *todoPresenter {
 	if cfg == nil {
-		panic("'cfg' is nil")
+		panic(ErrPanicCfgIsNil)
 	}
 	if i == nil {
-		panic("interactor is nil")
+		panic(ErrPanicInteractorIsNil)
 	}
 	if db == nil {
-		panic("'db' is nil")
+		panic(ErrPanicDbIsNil)
 	}
 	return &todoPresenter{
 		db:         db,
@@ -89,16 +95,7 @@ func (p *todoPresenter) CreateTodo(ctx echo.Context) error {
 	)
 
 	if data, err = p.input.Create(ctx); err != nil {
-		return err
-	}
-	if data == nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "empty todo data")
-	}
-	if data.Title == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "title is an empty string")
-	}
-	if data.Description == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "description is an empty string")
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	if err = p.db.Transaction(func(tx *gorm.DB) error {
 		c := app_context.WithDB(ctx.Request().Context(), tx)
@@ -109,13 +106,13 @@ func (p *todoPresenter) CreateTodo(ctx echo.Context) error {
 		}
 		return nil
 	}); err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	if output, err = p.output.Create(ctx, data); err != nil {
 		c := ctx.Request().Context()
 		app_context.LogFromContext(c).
 			ErrorContext(c, err.Error())
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	return ctx.JSON(http.StatusCreated, output)
 }

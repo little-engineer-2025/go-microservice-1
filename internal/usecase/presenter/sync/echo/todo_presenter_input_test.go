@@ -1,6 +1,7 @@
 package echo
 
 import (
+	"log/slog"
 	"net/http"
 	"testing"
 
@@ -42,5 +43,5 @@ func TestInputGetAll(t *testing.T) {
 
 	input = newTodoInput()
 	require.NotNil(t, input)
-	input.GetAll(helper_echo.NewContext(e, http.MethodGet, "/todos/v1/todo?param=value", http.Header{}, nil))
+	input.GetAll(helper_echo.NewContext(e, http.MethodGet, "/todos/v1/todo?param=value", http.Header{}, nil, slog.Default()))
 }
