@@ -120,6 +120,10 @@ test-integration:  ## Run integration tests
 	if [ "$${CI}" != "true" ] && [ "$${TEST}" == "integration" ]; then $(MAKE) .compose-wait-db || exit 1; fi
 	TEST=integration CONFIG_PATH="$(PROJECT_DIR)/configs" go test -parallel 1 ./internal/test/integration/... -test.failfast -test.v
 
+.PHONY: test-e2e
+test-e2e:  ## Run End 2 End tests
+	$(CONTAINER_ENGINE) run -it --rm --ipc=host mcr.microsoft.com/playwright:v1.53.0-noble /bin/bash
+
 # Add dependencies from binaries to all the the sources
 # so any change is detected for the build rule
 $(patsubst cmd/%,$(BIN)/%,$(wildcard cmd/*)): $(shell find $(PROJECT_DIR)/cmd -type f -name '*.go') $(shell find $(PROJECT_DIR)/pkg -type f -name '*.go' 2>/dev/null) $(shell find $(PROJECT_DIR)/internal -type f -name '*.go' 2>/dev/null)
@@ -215,3 +219,4 @@ coverage.out: coverage.tmp.out
 .PHONY: coverage
 coverage:  coverage.out  ## Printout coverage
 	go tool cover -func ./coverage.out
+
