@@ -31,6 +31,8 @@ include scripts/mk/db.mk
 include scripts/mk/printvars.mk
 include scripts/mk/lint.mk
 # tools
+include scripts/mk/meta-certs.mk
+include scripts/mk/certs.mk
 include scripts/mk/meta-apicurio.mk
 include scripts/mk/apicurio.mk
 include scripts/mk/plantuml.mk
