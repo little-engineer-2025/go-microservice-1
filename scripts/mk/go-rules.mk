@@ -102,6 +102,7 @@ TEST_GREP_FILTER := -v \
   -e '^$(TGF_PREFIX)/internal/api/http/public' \
   -e '^$(TGF_PREFIX)/internal/api/http/private' \
   -e '^$(TGF_PREFIX)/internal/api/event' \
+  -e '^$(TGF_PREFIX)/pkg/sync/http/todo' \
 
 
 .PHONY: test
@@ -109,7 +110,12 @@ test: test-unit test-integration  ## Run unit tests and integration tests; Could
 
 .PHONY: test-unit
 test-unit: ## Run unit tests
-	go test -parallel 4 -coverprofile="coverage.out" -covermode count $(MOD_VENDOR) $(shell go list ./... | grep $(TEST_GREP_FILTER) )
+	go test \
+	  -parallel 4 \
+	  -coverprofile="coverage.out" \
+	  -covermode count \
+	  $(MOD_VENDOR) \
+	  $(shell go list ./... | grep $(TEST_GREP_FILTER) )
 
 .PHONY: test-ci
 test-ci: ## Run tests for ci
@@ -139,6 +145,7 @@ generate-api: $(OAPI_CODEGEN) $(API_LIST) ## Generate server stubs from openapi
 	$(OAPI_CODEGEN) -generate spec -package public -o internal/api/http/public/spec.gen.go api/http/public.openapi.yaml
 	$(OAPI_CODEGEN) -generate server -package public -o internal/api/http/public/server.gen.go api/http/public.openapi.yaml
 	$(OAPI_CODEGEN) -generate types -package public -o internal/api/http/public/types.gen.go -alias-types api/http/public.openapi.yaml
+	$(OAPI_CODEGEN) -generate client,types -package public -o pkg/sync/http/todo/client.gen.go -alias-types api/http/public.openapi.yaml
 	# Internal API # FIXME Update -import-mapping options
 	$(OAPI_CODEGEN) -generate server -package private -o internal/api/http/private/server.gen.go api/http/internal.openapi.yaml
 	$(OAPI_CODEGEN) -generate types -package private -o internal/api/http/private/types.gen.go api/http/internal.openapi.yaml
