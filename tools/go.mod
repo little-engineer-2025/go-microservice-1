@@ -5,15 +5,13 @@ module github.com/avisiedo/go-microservice-1/tools
 // When updating go version, update the below too:
 //   .github/workflows/main.yml
 //   build/package/Dockerfile
-go 1.22
-
-toolchain go1.22.9
+go 1.23.0
 
 require (
 	github.com/achiku/planter v0.0.0-20230118102009-4847a8211e35
 	github.com/atombender/go-jsonschema v0.12.1
 	github.com/golangci/golangci-lint v1.59.1
-	github.com/loov/goda v0.5.11
+	github.com/loov/goda v0.7.1
 	github.com/mikefarah/yq/v4 v4.44.5
 	github.com/oapi-codegen/oapi-codegen/v2 v2.4.1
 	github.com/vektra/mockery/v2 v2.38.0
@@ -220,14 +218,13 @@ require (
 	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/exp v0.0.0-20240213143201-ec583247a57a // indirect
 	golang.org/x/exp/typeparams v0.0.0-20240314144324-c7f7c6466f7f // indirect
-	golang.org/x/mod v0.18.0 // indirect
-	golang.org/x/net v0.31.0 // indirect
-	golang.org/x/sync v0.9.0 // indirect
-	golang.org/x/sys v0.27.0 // indirect
-	golang.org/x/term v0.26.0 // indirect
-	golang.org/x/text v0.20.0 // indirect
-	golang.org/x/tools v0.22.0 // indirect
-	golang.org/x/tools/go/vcs v0.1.0-deprecated // indirect
+	golang.org/x/mod v0.24.0 // indirect
+	golang.org/x/net v0.40.0 // indirect
+	golang.org/x/sync v0.14.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/term v0.32.0 // indirect
+	golang.org/x/text v0.25.0 // indirect
+	golang.org/x/tools v0.33.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/op/go-logging.v1 v1.0.0-20160211212156-b2cb9fa56473 // indirect
