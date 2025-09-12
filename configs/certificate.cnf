@@ -1,0 +1,38 @@
+# see: man x509v3_config
+
+[req]
+default_bits = 4096
+default_keyfile = server-key.pem
+distinguished_name = subject
+req_extensions = req_ext
+x509_extensions = x509_ext
+string_mask = utf8only
+
+[subject]
+countryName =
+countryName_default = US
+stateOrProvinceName =
+stateOrProvinceName_default = California
+localityName =
+localityName_default = San Francisco
+organizationName =
+organizationName_default = My Company
+commonName =
+commonName_default = www.example.com
+emailAddress =
+emailAddress_default = test@example.com
+
+[x509_ext]
+subjectAltName = @alternate_names
+authorityKeyIdentifier = keyid,issuer
+
+[req_ext]
+subjectAltName = @alternate_names
+#authorityKeyIdentifier = keyid,issuer
+
+[ alternate_names ]
+DNS.1 =
+IP.1 =
+# DNS.2 = example.com
+# DNS.3 = www2.example.com
+
