@@ -16,7 +16,6 @@ CERT_CNF_TEMPLATE ?= configs/certificate.cnf
 CERT_DN ?= example.com
 # CERT_SERVERNAME ?= something.$(CERT_DN)
 CERT_IP ?= 127.0.0.1
-CERT_ALT_NAME ?= DNS:$(CERT_SERVERNAME),IP:$(CERT_IP)
 
 CERT_SERVERNAME_LIST ?= api.$(CERT_DN) db.$(CERT_DN) minio.$(CERT_DN) redis.$(CERT_DN)
 
@@ -38,15 +37,15 @@ $(CERT_DIR):
 #	openssl req -x509 -nodes -days 7 -newkey rsa:2048 -keyout "$(CERT_DIR)/$(CERT_SERVERNAME).key" -out "$(CERT_DIR)/$(CERT_SERVERNAME).crt" -config "$(CERT_DIR)/$(CERT_SERVERNAME).cnf"
 
 $(CERT_DIR)/%.key $(CERT_DIR)/%.csr $(CERT_DIR)/%.key: $(CERT_DIR)/%.cnf
+	SAN="$(CERT_SERVERNAME)" \
 	openssl req -new \
 		-config "$(CERT_DIR)/$(CERT_SERVERNAME).cnf" \
-		-keyout "$(CERT_DIR)/$(CERT_SERVERNAME).key" \
 		-out "$(CERT_DIR)/$(CERT_SERVERNAME).csr" \
+		-keyout "$(CERT_DIR)/$(CERT_SERVERNAME).key" \
 		-nodes
 
 $(CERT_DIR)/%.crt: $(CERT_DIR)/%.key $(CERT_DIR)/%.csr
 	openssl x509 -req \
-		-config "$(CERT_DIR)/$(CERT_SERVERNAME).cnf" \
 		-days 365 \
 		-in "$(CERT_DIR)/$(CERT_SERVERNAME).csr" \
 		-signkey "$(CERT_DIR)/$(CERT_SERVERNAME).key" \
@@ -54,12 +53,14 @@ $(CERT_DIR)/%.crt: $(CERT_DIR)/%.key $(CERT_DIR)/%.csr
 
 $(CERT_DIR)/%.cnf:
 	cat "$(CERT_CNF_TEMPLATE)" \
-		| sed -e "r/commonName =/commonName = $(CERT_SERVERNAME)/g" \
-		| sed -e "r/countryName =/countryName = US/g" \
-		| sed -e "r/stateOrProvinceName =/stateOrProvinceName = California/g" \
-		| sed -e "r/localityName =/localityName = San Francisco/g" \
-		| sed -e "r/organizationName =/organizationName = My Company/g" \
-		| sed -e "r/DNS.1 =/DNS.1 = $(CERT_SERVERNAME)/g" \
-		| sed -e "r/IP.1 =/IP.1 = $(CERT_IP)/g" > "$(CERT_DIR)/$(CERT_SERVERNAME).cnf" \
-		| tee "$@"
+		| sed -e "s/SAN =/SAN = $(CERT_SERVERNAME)/g" \
+		| sed -e "s/commonName =/commonName = $(CERT_SERVERNAME)/g" \
+		| sed -e "s/countryName =/countryName = US/g" \
+		| sed -e "s/stateOrProvinceName =/stateOrProvinceName = California/g" \
+		| sed -e "s/localityName =/localityName = San Francisco/g" \
+		| sed -e "s/organizationName =/organizationName = My Company/g" \
+		| sed -e "s/emailAddress =/emailAddress = test@example.com/g" \
+		| sed -e "s/DNS.1 =/DNS.1 = $(CERT_SERVERNAME)/g" \
+		| sed -e "s/IP.1 =/IP.1 = $(CERT_IP)/g" \
+		> "$@"
 

@@ -1,38 +1,30 @@
 # see: man x509v3_config
+# see: https://pki-tutorial-ng.readthedocs.io/en/latest/index.html
 
-[req]
+[ default ]
+SAN =
+
+[ req ]
 default_bits = 4096
-default_keyfile = server-key.pem
-distinguished_name = subject
-req_extensions = req_ext
-x509_extensions = x509_ext
+encrypt_key = no
+default_md = sha256
+utf8 = yes
 string_mask = utf8only
+prompt = yes
+distinguished_name = server_dn
+req_extensions = server_reqext
 
-[subject]
-countryName =
-countryName_default = US
-stateOrProvinceName =
-stateOrProvinceName_default = California
-localityName =
-localityName_default = San Francisco
-organizationName =
-organizationName_default = My Company
-commonName =
-commonName_default = www.example.com
-emailAddress =
-emailAddress_default = test@example.com
+[ server_dn ]
+0.domainComponent = "com"
+1.domainComponent = "example"
+2.domainComponent = "api"
+organizationName = "company"
+organizationalUnitName = "section"
+commonName = "api.example.com"
+commonName_max = 64
 
-[x509_ext]
-subjectAltName = @alternate_names
-authorityKeyIdentifier = keyid,issuer
-
-[req_ext]
-subjectAltName = @alternate_names
-#authorityKeyIdentifier = keyid,issuer
-
-[alternate_names]
-DNS.1 =
-IP.1 =
-# DNS.2 = example.com
-# DNS.3 = www2.example.com
-
+[ server_reqext ]
+keyUsage = critical,digitalSignature,keyEncipherment
+extendedKeyUsage = serverAuth,clientAuth
+subjectKeyIdentifier = hash
+subjectAltName = $ENV::SAN
