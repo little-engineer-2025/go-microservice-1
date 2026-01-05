@@ -158,7 +158,8 @@ test-unit: ## Run unit tests
 
 .PHONY: test-ci
 test-ci: ## Run tests for ci
-	go test $(MOD_VENDOR) ./...
+	go test -race -json -v -coverprofile="coverage.out" $(MOD_VENDOR) ./... 2>&1 | tee /tmp/gotest.log | $(GOTESTFMT)
+	$(GOCOVER_COBERTURA) < coverage.out > coverage.xml
 
 .PHONY: test-integration
 test-integration:  ## Run integration tests
