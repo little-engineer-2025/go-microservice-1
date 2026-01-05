@@ -27,6 +27,10 @@ MOCKERY := $(TOOLS_BIN)/mockery
 OAPI_CODEGEN := $(TOOLS_BIN)/oapi-codegen
 PLANTER := $(TOOLS_BIN)/planter
 YQ := $(TOOLS_BIN)/yq
+GOTESTFMT := $(TOOLS_BIN)/gotestfmt
+GOCOVER_COBERTURA := $(TOOLS_BIN)/gocover-cobertura
+GOCOV := $(TOOLS_BIN)/gocov
+GOCOV_XML := $(TOOLS_BIN)/gocov-xml
 
 TOOLS := \
 	$(GODA) \
@@ -36,6 +40,10 @@ TOOLS := \
 	$(PLANTER) \
 	$(YQ) \
 	$(GOJSONSCHEMA) \
+	$(GOTESTFMT) \
+	$(GOCOVER_COBERTURA) \
+	$(GOCOV) \
+	$(GOCOV_XML) \
 
 
 .PHONY: install-go-tools
