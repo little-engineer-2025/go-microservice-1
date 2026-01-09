@@ -20,29 +20,27 @@ pipeline {
             }
         }
 
-        stage('Cache Go Modules') {
+        stage('Generate caches') {
             agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
-                    // Usar caché para Go modules
-                    // Este paso puede variar según tu configuración de Jenkins
-                    sh '''
-                        go mod download
-                    '''
-                }
-            }
-        }
-
-        stage('Prepare CI') {
-            agent { docker { image 'docker.io/golang:1.24' } }
-            steps {
-                script {
-                    // Configuración de Git y herramientas
-                    sh '''
-                        # git config --system --add safe.directory $WORKSPACE
+                    // Calculate the hash
+                    def concatFile = readFile('go.mod') + readFile('go.sum') +
+                                     readFile('tools/go.mod') + readFile('tools/go.sum') +
+                                     readFile('requirements.txt') + readFile('requirements-dev.txt')
+                    def cacheKey = concatFile.hashCode()
+                    
+                    // Cache results
+                    cache(cacheKey, paths: [
+                        '/github/home/.cache/go-build',
+                        '/go/pkg/mod',
+                        'tools/bin',
+                        '.venv'
+                    ]) {
+                        // Get dependencies and build tools
                         make tidy
                         make install-go-tools
-                    '''
+                    }
                 }
             }
         }
@@ -51,15 +49,25 @@ pipeline {
             agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
-                    // Ejecutar un conjunto de cheques
-                    sh '''
-                        go version
-                        git diff go.mod go.sum tools/go.mod tools/go.sum
-                        make generate-api && git diff internal/api/http/
-                        make generate-mock && git diff internal/test/mock/
-                        make go-fmt && git diff internal/ cmd/
-                        make vet
-                    '''
+                    def concatFile = readFile('go.mod') + readFile('go.sum') +
+                                     readFile('tools/go.mod') + readFile('tools/go.sum') +
+                                     readFile('requirements.txt') + readFile('requirements-dev.txt')
+                    def cacheKey = concatFile.hashCode()
+                    cache(cacheKey, paths: [
+                        '/github/home/.cache/go-build',
+                        '/go/pkg/mod',
+                        'tools/bin',
+                        '.venv'
+                    ], skipSave: true) {
+                        sh '''
+                            go version
+                            git diff go.mod go.sum tools/go.mod tools/go.sum
+                            make generate-api && git diff internal/api/http/
+                            make generate-mock && git diff internal/test/mock/
+                            make go-fmt && git diff internal/ cmd/
+                            make vet
+                        '''
+                    }
                 }
             }
         }
@@ -67,10 +75,20 @@ pipeline {
         stage('Start Containers') {
             steps {
                 script {
-                    // Lanza el contenedor de PostgreSQL
-                    sh '''
-                        make compose-up
-                    '''
+                    def concatFile = readFile('go.mod') + readFile('go.sum') +
+                                     readFile('tools/go.mod') + readFile('tools/go.sum') +
+                                     readFile('requirements.txt') + readFile('requirements-dev.txt')
+                    def cacheKey = concatFile.hashCode()
+                    cache(cacheKey, paths: [
+                        '/github/home/.cache/go-build',
+                        '/go/pkg/mod',
+                        'tools/bin',
+                        '.venv'
+                    ], skipSave: true) {
+                        sh '''
+                            make compose-up
+                        '''
+                    }
                 }
             }
         }
@@ -79,12 +97,21 @@ pipeline {
             agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
-                    // Preparar archivos de configuración y ejecutar pruebas
-                    sh '''
-                        cp -vf configs/config.ci.yaml configs/config.yaml
-                        make db-migrate-up
-                        make test-ci
-                    '''
+                    def concatFile = readFile('go.mod') + readFile('go.sum') +
+                                     readFile('tools/go.mod') + readFile('tools/go.sum') +
+                                     readFile('requirements.txt') + readFile('requirements-dev.txt')
+                    def cacheKey = concatFile.hashCode()
+                    cache(cacheKey, paths: [
+                        '/github/home/.cache/go-build',
+                        '/go/pkg/mod',
+                        'tools/bin',
+                    ], skipSave: true) {
+                        sh '''
+                            cp -vf configs/config.ci.yaml configs/config.yaml
+                            make db-migrate-up
+                            make test-ci
+                        '''
+                    }
                 }
             }
         }
@@ -103,11 +130,20 @@ pipeline {
             agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
-                    // Generar informe de cobertura
-                    // La implementación real puede requerir un plugin de Jenkins para la cobertura de código
-                    sh '''
-                        # TODO Comando para generar cobertura
-                    '''
+                    def concatFile = readFile('go.mod') + readFile('go.sum') +
+                                     readFile('tools/go.mod') + readFile('tools/go.sum') +
+                                     readFile('requirements.txt') + readFile('requirements-dev.txt')
+                    def cacheKey = concatFile.hashCode()
+                    cache(cacheKey, paths: [
+                        '/github/home/.cache/go-build',
+                        '/go/pkg/mod',
+                        'tools/bin',
+                    ], skipSave: true) {
+                        // Generar informe de cobertura
+                        // La implementación real puede requerir un plugin de Jenkins para la cobertura de código
+                        sh '''
+                            # TODO Comando para generar cobertura
+                        '''
                 }
             }
         }
@@ -135,8 +171,18 @@ pipeline {
             agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
-                    // Construir ejecutables
-                    sh 'make build'
+                    def concatFile = readFile('go.mod') + readFile('go.sum') +
+                                     readFile('tools/go.mod') + readFile('tools/go.sum') +
+                                     readFile('requirements.txt') + readFile('requirements-dev.txt')
+                    def cacheKey = concatFile.hashCode()
+                    cache(cacheKey, paths: [
+                        '/github/home/.cache/go-build',
+                        '/go/pkg/mod',
+                        'tools/bin',
+                    ], skipSave: true) {
+                        // Construir ejecutables
+                        sh 'make build'
+                    }
                 }
             }
         }
