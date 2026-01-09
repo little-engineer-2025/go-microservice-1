@@ -1,3 +1,4 @@
+// https://www.jenkins.io/doc/book/pipeline/syntax/#declarative-pipeline
 pipeline {
     agent {
         docker {
