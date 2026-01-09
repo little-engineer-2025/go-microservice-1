@@ -41,7 +41,7 @@ pipeline {
                 script {
                     // Configuración de Git y herramientas
                     sh '''
-                        git config --system --add safe.directory $WORKSPACE
+                        # git config --system --add safe.directory $WORKSPACE
                         make tidy
                         make install-go-tools
                     '''
