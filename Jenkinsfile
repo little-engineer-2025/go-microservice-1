@@ -105,7 +105,7 @@ pipeline {
                     // Generar informe de cobertura
                     // La implementación real puede requerir un plugin de Jenkins para la cobertura de código
                     sh '''
-                        # Comando para generar cobertura
+                        # TODO Comando para generar cobertura
                     '''
                 }
             }
