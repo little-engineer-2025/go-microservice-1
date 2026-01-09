@@ -1,10 +1,6 @@
 // https://www.jenkins.io/doc/book/pipeline/syntax/#declarative-pipeline
 pipeline {
-    agent {
-        docker {
-            image 'docker.io/golang:1.24'
-        }
-    }
+    agent any
     
     environment {
         DATABASE_HOST = 'postgres'
@@ -25,6 +21,7 @@ pipeline {
         }
 
         stage('Cache Go Modules') {
+            agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
                     // Usar caché para Go modules
@@ -37,6 +34,7 @@ pipeline {
         }
 
         stage('Prepare CI') {
+            agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
                     // Configuración de Git y herramientas
@@ -50,6 +48,7 @@ pipeline {
         }
 
         stage('Run Checks') {
+            agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
                     // Ejecutar un conjunto de cheques
@@ -77,6 +76,7 @@ pipeline {
         }
 
         stage('Run Tests') {
+            agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
                     // Preparar archivos de configuración y ejecutar pruebas
@@ -100,6 +100,7 @@ pipeline {
         }
 
         stage('Generate Code Coverage Report') {
+            agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
                     // Generar informe de cobertura
@@ -115,6 +116,7 @@ pipeline {
             when {
                 expression { return env.BRANCH_NAME ==~ /PR-.*/ } // O ajustar según la lógica de PR
             }
+            agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
                     // Agregar comentario de cobertura en PR
@@ -130,6 +132,7 @@ pipeline {
         }
 
         stage('Build Executables') {
+            agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
                     // Construir ejecutables
