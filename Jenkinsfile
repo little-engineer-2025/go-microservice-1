@@ -76,9 +76,11 @@ pipeline {
                                          "-e POSTGRES_USER=${DATABASE_USER} " +
                                          "-e POSTGRES_PASSWORD=${DATABASE_PASSWORD}"
                         docker.image('docker.io/postgres:18').withRun(dockerArgs) { c ->
-                            cp -vf configs/config.ci.yaml configs/config.yaml
-                            make db-migrate-up
-                            make test-ci
+                            sh '''
+                                cp -vf configs/config.ci.yaml configs/config.yaml
+                                make db-migrate-up
+                                make test-ci
+                            '''
                         }
                     }
                 }
