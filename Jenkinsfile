@@ -24,20 +24,13 @@ pipeline {
             agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
-                    // Calculate the hash
-                    def concatFile = readFile('go.mod') + readFile('go.sum') +
-                                     readFile('tools/go.mod') + readFile('tools/go.sum') +
-                                     readFile('requirements.txt') + readFile('requirements-dev.txt')
-                    def cacheKey = concatFile.hashCode()
-                    
-                    // Cache results
-                    cache(cacheKey, paths: [
-                        '/github/home/.cache/go-build',
-                        '/go/pkg/mod',
-                        'tools/bin',
-                        '.venv'
+                    // Generate cache
+                    cache(maxCacheSize: 500, caches: [
+                        arbitraryFileCache(path: '/github/home/.cache/go-build', cacheValidityDecidingFile: 'go.sum'),
+                        arbitraryFileCache(path: '/go/pkg/mod', cacheValidityDecidingFile: 'go.sum'),
+                        arbitraryFileCache(path: './tools/bin', cacheValidityDecidingFile: 'tools/go.sum'),
+                        arbitraryFileCache(path: './.venv', cacheValidityDecidingFile: 'requirements-dev.txt')
                     ]) {
-                        // Get dependencies and build tools
                         make tidy
                         make install-go-tools
                     }
@@ -49,15 +42,11 @@ pipeline {
             agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
-                    def concatFile = readFile('go.mod') + readFile('go.sum') +
-                                     readFile('tools/go.mod') + readFile('tools/go.sum') +
-                                     readFile('requirements.txt') + readFile('requirements-dev.txt')
-                    def cacheKey = concatFile.hashCode()
-                    cache(cacheKey, paths: [
-                        '/github/home/.cache/go-build',
-                        '/go/pkg/mod',
-                        'tools/bin',
-                        '.venv'
+                    cache(maxCacheSize: 500, caches: [
+                        arbitraryFileCache(path: '/github/home/.cache/go-build', cacheValidityDecidingFile: 'go.sum'),
+                        arbitraryFileCache(path: '/go/pkg/mod', cacheValidityDecidingFile: 'go.sum'),
+                        arbitraryFileCache(path: './tools/bin', cacheValidityDecidingFile: 'tools/go.sum'),
+                        arbitraryFileCache(path: './.venv', cacheValidityDecidingFile: 'requirements-dev.txt')
                     ], skipSave: true) {
                         sh '''
                             go version
@@ -75,20 +64,9 @@ pipeline {
         stage('Start Containers') {
             steps {
                 script {
-                    def concatFile = readFile('go.mod') + readFile('go.sum') +
-                                     readFile('tools/go.mod') + readFile('tools/go.sum') +
-                                     readFile('requirements.txt') + readFile('requirements-dev.txt')
-                    def cacheKey = concatFile.hashCode()
-                    cache(cacheKey, paths: [
-                        '/github/home/.cache/go-build',
-                        '/go/pkg/mod',
-                        'tools/bin',
-                        '.venv'
-                    ], skipSave: true) {
-                        sh '''
-                            make compose-up
-                        '''
-                    }
+                    sh '''
+                        make compose-up
+                    '''
                 }
             }
         }
@@ -97,14 +75,11 @@ pipeline {
             agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
-                    def concatFile = readFile('go.mod') + readFile('go.sum') +
-                                     readFile('tools/go.mod') + readFile('tools/go.sum') +
-                                     readFile('requirements.txt') + readFile('requirements-dev.txt')
-                    def cacheKey = concatFile.hashCode()
-                    cache(cacheKey, paths: [
-                        '/github/home/.cache/go-build',
-                        '/go/pkg/mod',
-                        'tools/bin',
+                    cache(maxCacheSize: 500, caches: [
+                        arbitraryFileCache(path: '/github/home/.cache/go-build', cacheValidityDecidingFile: 'go.sum'),
+                        arbitraryFileCache(path: '/go/pkg/mod', cacheValidityDecidingFile: 'go.sum'),
+                        arbitraryFileCache(path: './tools/bin', cacheValidityDecidingFile: 'tools/go.sum'),
+                        arbitraryFileCache(path: './.venv', cacheValidityDecidingFile: 'requirements-dev.txt')
                     ], skipSave: true) {
                         sh '''
                             cp -vf configs/config.ci.yaml configs/config.yaml
@@ -130,14 +105,11 @@ pipeline {
             agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
-                    def concatFile = readFile('go.mod') + readFile('go.sum') +
-                                     readFile('tools/go.mod') + readFile('tools/go.sum') +
-                                     readFile('requirements.txt') + readFile('requirements-dev.txt')
-                    def cacheKey = concatFile.hashCode()
-                    cache(cacheKey, paths: [
-                        '/github/home/.cache/go-build',
-                        '/go/pkg/mod',
-                        'tools/bin'
+                    cache(maxCacheSize: 500, caches: [
+                        arbitraryFileCache(path: '/github/home/.cache/go-build', cacheValidityDecidingFile: 'go.sum'),
+                        arbitraryFileCache(path: '/go/pkg/mod', cacheValidityDecidingFile: 'go.sum'),
+                        arbitraryFileCache(path: './tools/bin', cacheValidityDecidingFile: 'tools/go.sum'),
+                        arbitraryFileCache(path: './.venv', cacheValidityDecidingFile: 'requirements-dev.txt')
                     ], skipSave: true) {
                         // Generar informe de cobertura
                         // La implementación real puede requerir un plugin de Jenkins para la cobertura de código
@@ -172,14 +144,11 @@ pipeline {
             agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
-                    def concatFile = readFile('go.mod') + readFile('go.sum') +
-                                     readFile('tools/go.mod') + readFile('tools/go.sum') +
-                                     readFile('requirements.txt') + readFile('requirements-dev.txt')
-                    def cacheKey = concatFile.hashCode()
-                    cache(cacheKey, paths: [
-                        '/github/home/.cache/go-build',
-                        '/go/pkg/mod',
-                        'tools/bin'
+                    cache(maxCacheSize: 500, caches: [
+                        arbitraryFileCache(path: '/github/home/.cache/go-build', cacheValidityDecidingFile: 'go.sum'),
+                        arbitraryFileCache(path: '/go/pkg/mod', cacheValidityDecidingFile: 'go.sum'),
+                        arbitraryFileCache(path: './tools/bin', cacheValidityDecidingFile: 'tools/go.sum'),
+                        arbitraryFileCache(path: './.venv', cacheValidityDecidingFile: 'requirements-dev.txt')
                     ], skipSave: true) {
                         // Construir ejecutables
                         sh 'make build'
