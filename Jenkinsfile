@@ -2,9 +2,8 @@
 pipeline {
     agent { docker { image 'docker.io/golang:1.24' } }
     
-    def dbHost = "db-server-${BUILD_TAG}"
     environment {
-        DATABASE_HOST = dbHost
+        DATABASE_HOST = "${BUILD_TAG}-postgresql
         DATABASE_PORT = '5432'
         DATABASE_NAME = 'database-db'
         DATABASE_USER = 'database-user'
@@ -70,7 +69,7 @@ pipeline {
                         arbitraryFileCache(path: './.venv', cacheValidityDecidingFile: 'requirements-dev.txt')
                     ], skipSave: true) {
                         // TODO Add environment variables
-                        def dockerArgs = "--name ${dbHost}" +
+                        def dockerArgs = "--name ${DATABASE_HOST}" +
                                          "-p ${DATABASE_PORT}:5432 " +
                                          "-e POSTGRES_USER=${DATABASE_USER} " +
                                          "-e POSTGRES_PASSWORD=${DATABASE_PASSWORD}"
