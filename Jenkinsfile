@@ -30,8 +30,10 @@ pipeline {
                         arbitraryFileCache(path: './tools/bin', cacheValidityDecidingFile: 'tools/go.sum'),
                         arbitraryFileCache(path: './.venv', cacheValidityDecidingFile: 'requirements-dev.txt')
                     ]) {
-                        make tidy
-                        make install-go-tools
+                        sh '''
+                            make tidy
+                            make install-go-tools
+                        '''
                     }
                 }
             }
