@@ -70,7 +70,6 @@ pipeline {
                         arbitraryFileCache(path: './.venv', cacheValidityDecidingFile: 'requirements-dev.txt')
                     ], skipSave: true) {
                         // TODO Add environment variables
-                        def dbHost = "db-server-${BUILD_TAG}"
                         def dockerArgs = "--name ${dbHost}" +
                                          "-p ${DATABASE_PORT}:5432 " +
                                          "-e POSTGRES_USER=${DATABASE_USER} " +
