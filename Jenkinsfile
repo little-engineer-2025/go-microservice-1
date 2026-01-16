@@ -1,9 +1,10 @@
 // https://www.jenkins.io/doc/book/pipeline/syntax/#declarative-pipeline
 pipeline {
-    agent any
+    agent { docker { image 'docker.io/golang:1.24' } }
     
+    def dbHost = "db-server-${BUILD_TAG}"
     environment {
-        DATABASE_HOST = 'postgres'
+        DATABASE_HOST = dbHost
         DATABASE_PORT = '5432'
         DATABASE_NAME = 'database-db'
         DATABASE_USER = 'database-user'
@@ -21,7 +22,6 @@ pipeline {
         }
 
         stage('Generate caches') {
-            agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
                     // Generate cache
@@ -39,7 +39,6 @@ pipeline {
         }
 
         stage('Run Checks') {
-            agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
                     cache(maxCacheSize: 500, caches: [
@@ -61,18 +60,7 @@ pipeline {
             }
         }
 
-        stage('Start Containers') {
-            steps {
-                script {
-                    sh '''
-                        make compose-up
-                    '''
-                }
-            }
-        }
-
         stage('Run Tests') {
-            agent { docker { image 'docker.io/golang:1.24' } }
             steps {
                 script {
                     cache(maxCacheSize: 500, caches: [
@@ -81,22 +69,18 @@ pipeline {
                         arbitraryFileCache(path: './tools/bin', cacheValidityDecidingFile: 'tools/go.sum'),
                         arbitraryFileCache(path: './.venv', cacheValidityDecidingFile: 'requirements-dev.txt')
                     ], skipSave: true) {
-                        sh '''
+                        // TODO Add environment variables
+                        def dbHost = "db-server-${BUILD_TAG}"
+                        def dockerArgs = "--name ${dbHost}" +
+                                         "-p ${DATABASE_PORT}:5432 " +
+                                         "-e POSTGRES_USER=${DATABASE_USER} " +
+                                         "-e POSTGRES_PASSWORD=${DATABASE_PASSWORD}"
+                        docker.image('docker.io/postgres:18').withRun(dockerArgs) { c ->
                             cp -vf configs/config.ci.yaml configs/config.yaml
                             make db-migrate-up
                             make test-ci
-                        '''
+                        }
                     }
-                }
-            }
-        }
-
-        stage('Stop Containers') {
-            steps {
-                script {
-                    sh '''
-                        make compose-down
-                    '''
                 }
             }
         }
