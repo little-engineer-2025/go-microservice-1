@@ -3,7 +3,7 @@ pipeline {
     agent { docker { image 'docker.io/golang:1.24' } }
     
     environment {
-        DATABASE_HOST = "${BUILD_TAG}-postgresql
+        DATABASE_HOST = "${BUILD_TAG}-postgresql"
         DATABASE_PORT = '5432'
         DATABASE_NAME = 'database-db'
         DATABASE_USER = 'database-user'
