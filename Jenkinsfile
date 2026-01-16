@@ -137,13 +137,14 @@ pipeline {
                     cache(cacheKey, paths: [
                         '/github/home/.cache/go-build',
                         '/go/pkg/mod',
-                        'tools/bin',
+                        'tools/bin'
                     ], skipSave: true) {
                         // Generar informe de cobertura
                         // La implementación real puede requerir un plugin de Jenkins para la cobertura de código
                         sh '''
                             # TODO Comando para generar cobertura
                         '''
+                    }
                 }
             }
         }
@@ -178,7 +179,7 @@ pipeline {
                     cache(cacheKey, paths: [
                         '/github/home/.cache/go-build',
                         '/go/pkg/mod',
-                        'tools/bin',
+                        'tools/bin'
                     ], skipSave: true) {
                         // Construir ejecutables
                         sh 'make build'
