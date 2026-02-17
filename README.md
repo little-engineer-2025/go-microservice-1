@@ -1,3 +1,6 @@
+> WARNING: This repository is archive
+> WARNING: You can follow the changes at https://github.com/avisiedo/go-microservice-1
+
 # go-microservice-1
 
 <!--
